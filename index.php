@@ -1,12 +1,10 @@
-<?php
-header('Content-Type: text/html; charset=utf-8');
-?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Atualiza a página a cada 240 segundos -->
     <meta http-equiv="refresh" content="240"> 
     <title>Horários</title>
     <style>
@@ -62,6 +60,6 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
     <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTvgCi-MJ_vIrxlPItD2r0h7KmITLvEArGFrsI8EbCWU5JKwVH6K0LFBHI2p75UNHUKEFpKPC37qMc8/embed?start=true&loop=false&delayms=1000" 
-        frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 </body>
 </html>
