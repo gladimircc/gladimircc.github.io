@@ -1,1 +1,24 @@
-{"pastas": ["2025-1", "bd", "docs", "escola", "flip", "horarios", "horariostech", "inauguracao", "iot", "isos", "tools", "unity"], "arquivos": ["UniSENAC_Pel-Calendario_Acadêmico_2025.pdf"]}
+{
+  "pastas": [
+    "SENAC",
+    "SENAC/UniSENAC",
+    "SENAC/escola",
+    "SENAC/tec",
+    "SENAC/teste",
+    "identidade_visual"
+  ],
+  "arquivos": [
+    "README.md",
+    "SENAC/UniSENAC/index.html",
+    "SENAC/escola/index.html",
+    "SENAC/index.html",
+    "SENAC/tec/index.hml",
+    "SENAC/teste/ddd.ttt",
+    "UniSENAC_Pel-Calendario_Acadêmico_2025.pdf",
+    "gerar-arvore.mjs",
+    "identidade_visual/unisenac_campus_pelotas2.jpg",
+    "index.html",
+    "package-lock.json",
+    "package.json"
+  ]
+}
