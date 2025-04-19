@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prof. Gladimir Ceroni Catarino</title>
+  <style>
+    body {
+      background-color: black;
+      color: #33ff33;
+      font-family: monospace;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      height: 60px;
+      margin-right: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    .iframe-wrapper {
+      border: 1px solid #33ff33;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    iframe {
+      width: 100%;
+      max-width: 640px;
+      height: 360px;
+    }
+    .time-box {
+      font-size: 16px;
+      margin-bottom: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #33ff33;
+      display: inline-block;
+      padding: 5px 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+    }
+    .dir a {
+      color: #ff66ff;
+      text-decoration: none;
+    }
+    .file a {
+      color: #3399ff;
+      text-decoration: none;
+    }
+    .dir::before {
+      content: "<DIR> ";
+      color: #00ff00;
+    }
+    .file::before {
+      content: "     ";
+    }
+    .file a:hover, .dir a:hover {
+      color: #ffcc00;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="docs/Identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo Uni SENAC" class="logo">
+    <h1>Prof. Gladimir Ceroni Catarino</h1>
+  </header>
+
+  <div class="iframe-wrapper">
+    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTvgCi-MJ_vIrxlPItD2r0h7KmITLvEArGFrsI8EbCWU5JKwVH6K0LFBHI2p75UNHUKEFpKPC37qMc8/embed?start=false&loop=false&delayms=3000" allowfullscreen></iframe>
+  </div>
+
+  <div class="time-box" id="horaAtual"></div>
+
+  <ul id="listagem"></ul>
+
+  <script>
+    function atualizarHora() {
+      const agora = new Date();
+      const h = String(agora.getHours()).padStart(2, '0');
+      const m = String(agora.getMinutes()).padStart(2, '0');
+      const s = String(agora.getSeconds()).padStart(2, '0');
+      document.getElementById('horaAtual').textContent = `Hora atual: ${h}:${m}:${s}`;
+    }
+    setInterval(atualizarHora, 1000);
+    atualizarHora();
+
+    const arquivos = [
+      { nome: '2025-1', tipo: 'dir' },
+      { nome: 'bd', tipo: 'dir' },
+      { nome: 'docs', tipo: 'dir' },
+      { nome: 'escola', tipo: 'dir' },
+      { nome: 'flip', tipo: 'dir' },
+      { nome: 'horarios', tipo: 'dir' },
+      { nome: 'horariostech', tipo: 'dir' },
+      { nome: 'inauguracao', tipo: 'dir' },
+      { nome: 'iot', tipo: 'dir' },
+      { nome: 'isos', tipo: 'dir' },
+      { nome: 'tools', tipo: 'dir' },
+      { nome: 'unity', tipo: 'dir' },
+      { nome: 'UniSENAC_Pel-Calendario_Acadêmico_2025.pdf', tipo: 'file' }
+    ];
+
+    const listagem = document.getElementById('listagem');
+    arquivos.forEach(arq => {
+      const li = document.createElement('li');
+      li.className = arq.tipo;
+      const a = document.createElement('a');
+      a.href = `./${arq.nome}`;
+      a.textContent = ` ${arq.nome}`;
+      li.appendChild(a);
+      listagem.appendChild(li);
+    });
+  </script>
+</body>
+</html>
 
