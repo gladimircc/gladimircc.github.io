@@ -4,7 +4,6 @@
  | | |_ | |/ _` |/ _` | | '_ ` _ \| | '__|
  | |__| | | (_| | (_| | | | | | | | | |   
   \_____|_|\__,_|\__,_|_|_| |_| |_|_|_|   
-
                                            
 "Tecnologia muda o mundo. Educação transforma pessoas."  
 — *Gladimir Ceroni Catarino*
