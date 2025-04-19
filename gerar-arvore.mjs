@@ -7,10 +7,10 @@ const entries = await globby([
   '!**/node_modules/**',
   '!**/.git/**',
   '!files.json',
-  '!.github/**',
   '!gerar-arvore.*',
+  '!.github/**',
   '!package*.json',
-  '!package-lock.json'
+  '!package-lock.json',
 ], {
   onlyFiles: false
 });
@@ -19,7 +19,6 @@ const estrutura = [];
 
 for (const entry of entries) {
   const stat = fs.statSync(entry);
-
   const isIndexHtml = entry.toLowerCase().endsWith('index.html');
   const isJsonFile = entry.toLowerCase().endsWith('.json');
 
