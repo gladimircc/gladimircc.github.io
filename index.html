@@ -1,98 +1,160 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prof. Gladimir Ceroni Catarino</title>
-  <meta name="robots" content="noindex, nofollow">
   <style>
     :root {
-      --bg: #000;
-      --fg: #33ff33;
-      --link-dir: #ffcc00;
-      --link-file: #00ccff;
+      --bg-color: #000;
+      --text-color: #33ff33;
+      --link-color: #3399ff;
+      --dir-color: #ff66ff;
     }
+
+    body.light {
+      --bg-color: #fff;
+      --text-color: #222;
+      --link-color: #0077cc;
+      --dir-color: #bb00bb;
+    }
+
     body {
-      background-color: var(--bg);
-      color: var(--fg);
+      background-color: var(--bg-color);
+      color: var(--text-color);
       font-family: monospace;
-      margin: 0; padding: 20px;
+      margin: 0;
+      padding: 20px;
     }
-    a { color: inherit; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .folder { color: var(--link-dir); }
-    .file { color: var(--link-file); }
-    .breadcrumb a { color: var(--fg); margin-right: 5px; }
-    .breadcrumb span { margin-right: 5px; }
-    #temaBtn {
-      position: fixed; top: 20px; right: 20px;
-      background: none; border: 1px solid var(--fg); color: var(--fg);
-      padding: 5px 10px; cursor: pointer; font-family: monospace;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      height: 60px;
+    }
+
+    .breadcrumb {
+      margin: 10px 0;
+      font-size: 1.2em;
+    }
+
+    .breadcrumb a {
+      color: var(--link-color);
+    }
+
+    .entry {
+      margin: 5px 0;
+    }
+
+    .folder {
+      color: var(--dir-color);
+    }
+
+    .file {
+      color: var(--link-color);
+    }
+
+    #themeToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 5px 10px;
+      border: 1px solid var(--text-color);
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <button id="temaBtn">Alternar tema</button>
-  <h1><img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSenac" style="height: 40px; vertical-align: middle;"> Prof. Gladimir Ceroni Catarino</h1>
-  <div class="breadcrumb" id="breadcrumb"></div>
-  <div><a href="javascript:history.back()">&#x21A9; Voltar</a></div>
-  <pre id="listagem"></pre>
-  <div id="contador"></div>
+  <button id="themeToggle">Alternar tema</button>
+
+  <div class="logo">
+    <img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" />
+    <h1>Prof. Gladimir Ceroni Catarino</h1>
+  </div>
+
+  <div id="breadcrumb" class="breadcrumb"></div>
+  <a id="backLink" class="back-link" href="#">↩️ Voltar</a>
+
+  <pre id="lista"></pre>
+  <p id="contador"></p>
 
   <script>
-    const temaBtn = document.getElementById('temaBtn');
-    temaBtn.onclick = () => {
-      const root = document.documentElement;
-      if (root.style.getPropertyValue('--bg') === '#000') {
-        root.style.setProperty('--bg', '#fff');
-        root.style.setProperty('--fg', '#000');
-        temaBtn.textContent = 'Tema escuro';
-      } else {
-        root.style.setProperty('--bg', '#000');
-        root.style.setProperty('--fg', '#33ff33');
-        temaBtn.textContent = 'Alternar tema';
-      }
-    };
+    // Alternar tema
+    const toggleBtn = document.getElementById("themeToggle");
+    const currentTheme = localStorage.getItem("theme") || "dark";
+    document.body.classList.toggle("light", currentTheme === "light");
 
-    const caminhoAtual = decodeURIComponent(location.pathname.replace(/^\//, '')) || '.';
-    const caminhoParts = caminhoAtual.split('/').filter(Boolean);
-    const caminhoBase = caminhoParts.join('/') || '.';
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
+    });
 
-    fetch('/files.json')
-      .then(r => r.json())
-      .then(lista => {
-        const pre = document.getElementById('listagem');
-        const breadcrumb = document.getElementById('breadcrumb');
-        const contador = document.getElementById('contador');
+    // Caminho atual
+    const path = window.location.pathname.replace(/^\//, "").replace(/\/$/, "");
+    const pastaAtual = path || "~";
 
-        // caminho de pão
-        let acum = '';
-        breadcrumb.innerHTML = '<span>~/</span>';
-        caminhoParts.forEach((parte, i) => {
-          acum += '/' + parte;
-          breadcrumb.innerHTML += `<a href="${acum}/">${parte}</a><span>/</span>`;
+    // Breadcrumb dinâmico
+    const breadcrumb = document.getElementById("breadcrumb");
+    if (pastaAtual === "~") {
+      breadcrumb.innerHTML = "~/";
+    } else {
+      const partes = pastaAtual.split("/");
+      breadcrumb.innerHTML = '<a href="/">~</a>/';
+      let acumulador = "";
+      partes.forEach((parte, i) => {
+        acumulador += (i > 0 ? "/" : "") + parte;
+        breadcrumb.innerHTML += `<a href="/${acumulador}/">${parte}</a>/`;
+      });
+    }
+
+    // Link para voltar
+    const backLink = document.getElementById("backLink");
+    const upDir = path.split("/").slice(0, -1).join("/");
+    backLink.href = "/" + upDir;
+    if (pastaAtual === "~") backLink.style.display = "none";
+
+    // Carregar lista
+    fetch("/files.json")
+      .then((r) => r.json())
+      .then((data) => {
+        const container = document.getElementById("lista");
+        const entries = data.filter((item) => {
+          if (pastaAtual === "~") return !item.path.includes("/");
+          return item.path.startsWith(pastaAtual + "/") && item.path.split("/").length === pastaAtual.split("/").length + 1;
         });
 
-        // filtra arquivos da pasta atual
-        const visiveis = lista.filter(item => {
-          const dir = item.path.replace(/\/g, '/');
-          const esperado = caminhoBase === '.' ? !dir.includes('/') : dir.startsWith(caminhoBase + '/') && !dir.slice(caminhoBase.length + 1).includes('/');
-          return esperado;
+        const pastas = entries.filter(e => e.type === "folder");
+        const arquivos = entries.filter(e => e.type === "file");
+
+        pastas.forEach(e => {
+          container.innerHTML += `<div class="entry folder">📁 <a href="${e.path}/">${e.name}</a></div>`;
         });
 
-        let pastas = 0, arquivos = 0;
-        visiveis.forEach(item => {
-          const nomeExibido = item.name;
-          if (item.type === 'folder') {
-            pastas++;
-            pre.innerHTML += `<span class="folder">&#128193; <a href="${item.path}/">${nomeExibido}</a></span>\n`;
-          } else {
-            arquivos++;
-            pre.innerHTML += `<span class="file">&#128196; <a href="/${item.path}">${nomeExibido}</a></span>\n`;
-          }
+        arquivos.forEach(e => {
+          container.innerHTML += `<div class="entry file">📄 <a href="/${e.path}">${e.name}</a></div>`;
         });
 
-        contador.textContent = `${pastas} pasta(s), ${arquivos} arquivo(s)`;
+        document.getElementById("contador").textContent = `${pastas.length} pasta(s), ${arquivos.length} arquivo(s)`;
       });
   </script>
 </body>
