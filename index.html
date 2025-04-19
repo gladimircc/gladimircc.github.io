@@ -148,7 +148,7 @@
         const arquivos = entries.filter(e => e.type === "file").sort((a, b) => a.name.localeCompare(b.name));
 
         pastas.forEach(e => {
-          container.innerHTML += `<div class="entry folder">📁 <a href="${e.path}/">${e.name}</a></div>`;
+          container.innerHTML += `<div class="entry folder">📁 <a href="${e.name}/">${e.name}</a></div>`;
         });
 
         arquivos.forEach(e => {
