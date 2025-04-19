@@ -110,20 +110,20 @@
     });
 
     // Caminho atual
-    const path = window.location.pathname.replace(/^\//, "").replace(/\/$/, "");
+    const path = window.location.pathname.replace(/^\/|\/$/g, "");
     const pastaAtual = path || "~";
 
-    // Breadcrumb dinâmico
+    // Breadcrumb dinâmico com ícones 📁
     const breadcrumb = document.getElementById("breadcrumb");
-    if (pastaAtual === "~") {
-      breadcrumb.innerHTML = "~/";
+    const partes = pastaAtual === "~" ? [] : pastaAtual.split("/");
+    if (partes.length === 0) {
+      breadcrumb.innerHTML = `📁 <a href="/">~</a>`;
     } else {
-      const partes = pastaAtual.split("/");
-      breadcrumb.innerHTML = '<a href="/">~</a>/';
       let acumulador = "";
+      breadcrumb.innerHTML = `📁 <a href="/">~</a>`;
       partes.forEach((parte, i) => {
-        acumulador += (i > 0 ? "/" : "") + parte;
-        breadcrumb.innerHTML += `<a href="/${acumulador}/">${parte}</a>/`;
+        acumulador += "/" + parte;
+        breadcrumb.innerHTML += ` / <a href="${acumulador}/">${parte}</a>`;
       });
     }
 
@@ -138,13 +138,14 @@
       .then((r) => r.json())
       .then((data) => {
         const container = document.getElementById("lista");
+
         const entries = data.filter((item) => {
           if (pastaAtual === "~") return !item.path.includes("/");
           return item.path.startsWith(pastaAtual + "/") && item.path.split("/").length === pastaAtual.split("/").length + 1;
         });
 
-        const pastas = entries.filter(e => e.type === "folder");
-        const arquivos = entries.filter(e => e.type === "file");
+        const pastas = entries.filter(e => e.type === "folder").sort((a, b) => a.name.localeCompare(b.name));
+        const arquivos = entries.filter(e => e.type === "file").sort((a, b) => a.name.localeCompare(b.name));
 
         pastas.forEach(e => {
           container.innerHTML += `<div class="entry folder">📁 <a href="${e.path}/">${e.name}</a></div>`;
