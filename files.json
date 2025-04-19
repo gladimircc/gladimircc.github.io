@@ -20,11 +20,6 @@
     "type": "folder"
   },
   {
-    "name": "index.html",
-    "path": "index.html",
-    "type": "file"
-  },
-  {
     "name": "UniSENAC",
     "path": "SENAC/UniSENAC",
     "type": "folder"
@@ -33,11 +28,6 @@
     "name": "escola",
     "path": "SENAC/escola",
     "type": "folder"
-  },
-  {
-    "name": "index.html",
-    "path": "SENAC/index.html",
-    "type": "file"
   },
   {
     "name": "tec",
@@ -52,16 +42,6 @@
   {
     "name": "unisenac_campus_pelotas2.jpg",
     "path": "identidade_visual/unisenac_campus_pelotas2.jpg",
-    "type": "file"
-  },
-  {
-    "name": "index.html",
-    "path": "SENAC/UniSENAC/index.html",
-    "type": "file"
-  },
-  {
-    "name": "index.html",
-    "path": "SENAC/escola/index.html",
     "type": "file"
   },
   {
