@@ -1,0 +1,54 @@
+name: Gerar files.json
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  gerar-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências
+        run: npm install fs path
+
+      - name: Gerar arquivo files.json
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          const ignorar = ['.git', '.github', 'files.json', 'README.md', 'index.html'];
+
+          const arquivos = [];
+          const pastas = [];
+
+          fs.readdirSync('.', { withFileTypes: true }).forEach((entry) => {
+            if (ignorar.includes(entry.name)) return;
+            if (entry.isDirectory()) pastas.push(entry.name);
+            else arquivos.push(entry.name);
+          });
+
+          const json = JSON.stringify({ pastas, arquivos }, null, 2);
+          fs.writeFileSync('files.json', json);
+          console.log('Arquivo files.json criado com sucesso!');
+          EOF
+
+      - name: Commit e push se houver mudanças
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add files.json
+          git diff --cached --quiet || git commit -m "Atualiza files.json automaticamente"
+          git push
+
