@@ -6,100 +6,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <style>
+    :root {
+      --bg: #000;
+      --fg: #33ff33;
+      --folder: #ff66ff;
+      --file: #3399ff;
+    }
+    [data-theme="light"] {
+      --bg: #f4f4f4;
+      --fg: #000;
+      --folder: #d6336c;
+      --file: #0077cc;
+    }
     body {
       font-family: monospace;
-      background-color: #000;
-      color: #33ff33;
+      background-color: var(--bg);
+      color: var(--fg);
       margin: 0;
       padding: 0;
     }
     header {
-      background-color: #000;
-      color: #33ff33;
+      background-color: var(--bg);
+      color: var(--fg);
       padding: 20px;
       text-align: center;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
     }
-    header img.logo {
-      width: 160px;
-      margin-right: 15px;
+    .logo {
+      height: 50px;
     }
-    h1 { font-size: 24px; }
     .terminal {
       padding: 20px;
       white-space: pre-wrap;
       max-width: 1000px;
       margin: auto;
     }
-    .folder { color: #ff66ff; }
-    .file { color: #3399ff; }
-    .breadcrumb {
-      color: #33ff33;
-      margin-bottom: 15px;
-    }
-    .filter {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .filter select {
-      font-family: monospace;
-      padding: 5px;
-    }
+    .folder { color: var(--folder); }
+    .file { color: var(--file); }
     a { color: inherit; text-decoration: none; }
     a:hover { text-decoration: underline; }
+    .breadcrumb a { margin-right: 4px; text-decoration: underline; }
+    .stats { margin-top: 1em; font-size: 14px; opacity: 0.8; }
+    .toggle-btn {
+      background: none;
+      color: var(--fg);
+      border: 1px solid var(--fg);
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo Uni SENAC" class="logo">
+    <img src="identidade_visual/unisenac_campus_pelotas2.jpg" class="logo" alt="Logo UniSENAC">
     <h1>Prof. Gladimir Ceroni Catarino</h1>
+    <button class="toggle-btn" onclick="toggleTheme()">🌓 Tema</button>
   </header>
 
   <div class="terminal">
-    <div class="breadcrumb" id="breadcrumb">~/</div>
-
-    <div class="filter">
-      <label for="fileType">Filtrar por tipo: </label>
-      <select id="fileType" onchange="renderList()">
-        <option value="all">Todos</option>
-        <option value="folder">Pastas</option>
-        <option value="file">Arquivos</option>
-      </select>
-    </div>
-
+    <div class="breadcrumb" id="breadcrumb"></div>
     <div id="fileList"></div>
+    <div class="stats" id="stats"></div>
   </div>
 
   <script>
     let allFiles = [];
+    let currentPath = '';
 
     function iconFor(path) {
       const ext = path.split('.').pop().toLowerCase();
       if (path.endsWith('/')) return '📁';
-      if (['jpg', 'png', 'gif', 'bmp', 'jpeg', 'svg'].includes(ext)) return '🖼️';
-      if (['mp3', 'wav', 'ogg'].includes(ext)) return '🎵';
-      if (['mp4', 'webm', 'avi'].includes(ext)) return '🎬';
-      if (['pdf'].includes(ext)) return '📄';
-      if (['zip', 'rar', '7z'].includes(ext)) return '🗜️';
-      if (['txt', 'md'].includes(ext)) return '📃';
+      if (["jpg","png","gif","bmp","jpeg","svg"].includes(ext)) return '🖼️';
+      if (["mp3","wav","ogg"].includes(ext)) return '🎵';
+      if (["mp4","webm","avi"].includes(ext)) return '🎬';
+      if (["pdf"].includes(ext)) return '📄';
+      if (["zip","rar","7z"].includes(ext)) return '🗜️';
+      if (["txt","md"].includes(ext)) return '📃';
       return '📄';
+    }
+
+    function renderBreadcrumb(path) {
+      const parts = path.split('/').filter(Boolean);
+      let html = '<a href="#">↩️</a> <a href="#">~/</a>';
+      let fullPath = '';
+      for (let i = 0; i < parts.length; i++) {
+        fullPath += (i > 0 ? '/' : '') + parts[i];
+        html += `<a href="#${encodeURIComponent(fullPath)}">${parts[i]}/</a>`;
+      }
+      document.getElementById('breadcrumb').innerHTML = html;
     }
 
     function renderList() {
       const list = document.getElementById('fileList');
-      const filter = document.getElementById('fileType').value;
       const path = location.hash ? decodeURIComponent(location.hash.substring(1)) : '';
+      currentPath = path;
       const prefix = path ? path + '/' : '';
-      const breadcrumb = document.getElementById('breadcrumb');
-      breadcrumb.textContent = `~/${path}`;
-
       const items = allFiles.filter(e => e.path.startsWith(prefix) && !e.path.slice(prefix.length).includes('/'));
-      list.innerHTML = '';
+      const stats = document.getElementById('stats');
 
+      renderBreadcrumb(path);
+      list.innerHTML = '';
       items.forEach(e => {
-        if (filter !== 'all' && e.type !== filter) return;
         const icon = iconFor(e.path);
         const line = document.createElement('div');
         if (e.type === 'folder') {
@@ -110,6 +120,14 @@
         }
         list.appendChild(line);
       });
+      const numFolders = items.filter(e => e.type === 'folder').length;
+      const numFiles = items.filter(e => e.type === 'file').length;
+      stats.textContent = `${numFolders} pastas e ${numFiles} arquivos`;
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
     }
 
     window.addEventListener('hashchange', renderList);
