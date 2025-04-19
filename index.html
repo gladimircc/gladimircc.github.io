@@ -4,94 +4,122 @@
   <meta charset="UTF-8">
   <title>Prof. Gladimir Ceroni Catarino</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <style>
     body {
+      font-family: monospace;
       background-color: #000;
       color: #33ff33;
-      font-family: monospace;
       margin: 0;
-      padding: 1rem;
+      padding: 0;
     }
-    h1 {
-      color: #00ff00;
+    header {
+      background-color: #000;
+      color: #33ff33;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    header img.logo {
+      width: 160px;
+      margin-right: 15px;
+    }
+    h1 { font-size: 24px; }
+    .terminal {
+      padding: 20px;
+      white-space: pre-wrap;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .folder { color: #ff66ff; }
+    .file { color: #3399ff; }
     .breadcrumb {
-      margin-bottom: 1rem;
-      color: #ccc;
+      color: #33ff33;
+      margin-bottom: 15px;
     }
-    .breadcrumb span {
-      margin-right: 5px;
+    .filter {
+      text-align: center;
+      margin-bottom: 20px;
     }
-    .item {
-      margin: 5px 0;
+    .filter select {
+      font-family: monospace;
+      padding: 5px;
     }
-    .folder::before {
-      content: "📁 ";
-    }
-    .file::before {
-      content: "📄 ";
-    }
-    a {
-      color: #3399ff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>📁 Prof. Gladimir Ceroni Catarino</h1>
-  <div class="breadcrumb" id="breadcrumb"></div>
-  <div id="listagem"></div>
+  <header>
+    <img src="identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo Uni SENAC" class="logo">
+    <h1>Prof. Gladimir Ceroni Catarino</h1>
+  </header>
+
+  <div class="terminal">
+    <div class="breadcrumb" id="breadcrumb">~/</div>
+
+    <div class="filter">
+      <label for="fileType">Filtrar por tipo: </label>
+      <select id="fileType" onchange="renderList()">
+        <option value="all">Todos</option>
+        <option value="folder">Pastas</option>
+        <option value="file">Arquivos</option>
+      </select>
+    </div>
+
+    <div id="fileList"></div>
+  </div>
 
   <script>
-    async function carregarArquivos(caminho = '') {
-      const res = await fetch('files.json');
-      const dados = await res.json();
+    let allFiles = [];
 
-      const pastaAtual = caminho ? caminho + '/' : '';
-      const container = document.getElementById('listagem');
+    function iconFor(path) {
+      const ext = path.split('.').pop().toLowerCase();
+      if (path.endsWith('/')) return '📁';
+      if (['jpg', 'png', 'gif', 'bmp', 'jpeg', 'svg'].includes(ext)) return '🖼️';
+      if (['mp3', 'wav', 'ogg'].includes(ext)) return '🎵';
+      if (['mp4', 'webm', 'avi'].includes(ext)) return '🎬';
+      if (['pdf'].includes(ext)) return '📄';
+      if (['zip', 'rar', '7z'].includes(ext)) return '🗜️';
+      if (['txt', 'md'].includes(ext)) return '📃';
+      return '📄';
+    }
+
+    function renderList() {
+      const list = document.getElementById('fileList');
+      const filter = document.getElementById('fileType').value;
+      const path = location.hash ? decodeURIComponent(location.hash.substring(1)) : '';
+      const prefix = path ? path + '/' : '';
       const breadcrumb = document.getElementById('breadcrumb');
-      container.innerHTML = '';
+      breadcrumb.textContent = `~/${path}`;
 
-      // Atualiza breadcrumb
-      const partes = caminho.split('/').filter(p => p);
-      let acumulador = '';
-      breadcrumb.innerHTML = '<span><a href="#" onclick="carregarArquivos(\'\')">~/</a></span>';
-      partes.forEach((parte, i) => {
-        acumulador += (i ? '/' : '') + parte;
-        breadcrumb.innerHTML += `<span>/<a href="#" onclick="carregarArquivos('${acumulador}')">${parte}</a></span>`;
-      });
+      const items = allFiles.filter(e => e.path.startsWith(prefix) && !e.path.slice(prefix.length).includes('/'));
+      list.innerHTML = '';
 
-      // Filtra por caminho
-      const itens = dados.filter(item => {
-        const path = item.path;
-        const dir = path.substring(0, path.lastIndexOf('/'));
-        return (item.type === 'folder' && path === pastaAtual + item.name) ||
-               (item.type === 'file' && dir === caminho);
-      });
-
-      // Ordena: pastas primeiro
-      itens.sort((a, b) => {
-        if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
-        return a.name.localeCompare(b.name);
-      });
-
-      // Exibe
-      itens.forEach(item => {
-        const div = document.createElement('div');
-        div.className = `item ${item.type}`;
-        if (item.type === 'folder') {
-          div.innerHTML = `<a href="#" onclick="carregarArquivos('${item.path}')">${item.name}</a>`;
+      items.forEach(e => {
+        if (filter !== 'all' && e.type !== filter) return;
+        const icon = iconFor(e.path);
+        const line = document.createElement('div');
+        if (e.type === 'folder') {
+          const target = encodeURIComponent(e.path);
+          line.innerHTML = `<span class="folder">${icon} <a href="#${target}">${e.name}</a></span>`;
         } else {
-          div.innerHTML = `<a href="${item.path}" target="_blank">${item.name}</a>`;
+          line.innerHTML = `<span class="file">${icon} <a href="${e.path}" target="_blank">${e.name}</a></span>`;
         }
-        container.appendChild(div);
+        list.appendChild(line);
       });
     }
 
-    carregarArquivos();
+    window.addEventListener('hashchange', renderList);
+
+    fetch('files.json')
+      .then(resp => resp.json())
+      .then(data => {
+        allFiles = data;
+        renderList();
+      });
   </script>
 </body>
 </html>
