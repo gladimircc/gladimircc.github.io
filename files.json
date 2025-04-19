@@ -20,6 +20,11 @@
     "type": "folder"
   },
   {
+    "name": "teste",
+    "path": "teste",
+    "type": "folder"
+  },
+  {
     "name": "UniSENAC",
     "path": "SENAC/UniSENAC",
     "type": "folder"
@@ -37,6 +42,11 @@
   {
     "name": "unisenac_campus_pelotas2.jpg",
     "path": "identidade_visual/unisenac_campus_pelotas2.jpg",
+    "type": "file"
+  },
+  {
+    "name": "exemplo.txt",
+    "path": "teste/exemplo.txt",
     "type": "file"
   }
 ]
