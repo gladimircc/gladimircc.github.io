@@ -48,5 +48,15 @@
     "name": "exemplo.txt",
     "path": "teste/exemplo.txt",
     "type": "file"
+  },
+  {
+    "name": "teste2",
+    "path": "teste/teste2",
+    "type": "folder"
+  },
+  {
+    "name": "exemplo2.bat",
+    "path": "teste/teste2/exemplo2.bat",
+    "type": "file"
   }
 ]
