@@ -1,8 +1,14 @@
 // gerar-arvore.mjs
-import fs from 'fs';
+import fs from 'node:fs';
 import { globby } from 'globby';
 
-const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**'], {
+const entries = await globby([
+  '**/*',
+  '!**/node_modules/**',
+  '!**/.git/**',
+  '!files.json',
+  '!.github/**'
+], {
   onlyFiles: false
 });
 
@@ -11,7 +17,6 @@ const arquivos = [];
 
 entries.forEach((entry) => {
   const stat = fs.statSync(entry);
-
   if (stat.isDirectory()) {
     pastas.add(entry);
   } else if (stat.isFile()) {
