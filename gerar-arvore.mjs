@@ -1,3 +1,4 @@
+// gerar-arvore.mjs
 import fs from 'node:fs';
 import { globby } from 'globby';
 
@@ -9,7 +10,6 @@ const estrutura = [];
 
 for (const entry of entries) {
   const stat = fs.statSync(entry);
-
   estrutura.push({
     name: entry.split('/').pop(),
     path: entry,
