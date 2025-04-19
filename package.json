@@ -1,6 +1,7 @@
 echo '{
   "name": "gladimircc-github-pages",
   "version": "1.0.0",
+  "type": "module",
   "description": "Gerador automático de arquivos JSON para GitHub Pages",
   "type": "module",
   "scripts": {
