@@ -1,13 +1,16 @@
-echo '{
-  "name": "gladimircc-github-pages",
+{
+  "name": "gladimircc.github.io",
   "version": "1.0.0",
-  "type": "module",
   "description": "Gerador automático de arquivos JSON para GitHub Pages",
   "type": "module",
+  "main": "gerar-arvore.mjs",
   "scripts": {
     "start": "node gerar-arvore.mjs"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "globby": "^13.2.2"
+    "globby": "^14.1.0"
   }
-}' > package.json
+}
