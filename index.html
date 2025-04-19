@@ -26,6 +26,7 @@
       font-size: 1.1em;
       margin: 0;
       padding: 20px;
+      transition: background-color 0.4s, color 0.4s;
     }
 
     a {
@@ -41,10 +42,16 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      transition: transform 0.3s ease;
     }
 
     .logo img {
       height: 60px;
+      transition: height 0.4s ease;
+    }
+
+    body.light .logo img {
+      height: 70px;
     }
 
     .breadcrumb {
@@ -78,6 +85,7 @@
       background: transparent;
       color: var(--text-color);
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
     .back-link {
@@ -90,7 +98,7 @@
   <button id="themeToggle">Alternar tema</button>
 
   <div class="logo">
-    <img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" />
+    <img id="logoImg" src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" />
     <h1>Prof. Gladimir Ceroni Catarino</h1>
   </div>
 
@@ -101,13 +109,24 @@
   <p id="contador"></p>
 
   <script>
+    const logo = document.getElementById("logoImg");
     const toggleBtn = document.getElementById("themeToggle");
-    const currentTheme = localStorage.getItem("theme") || "dark";
-    document.body.classList.toggle("light", currentTheme === "light");
+
+    function aplicarTema(tema) {
+      const isClaro = tema === "light";
+      document.body.classList.toggle("light", isClaro);
+      localStorage.setItem("theme", tema);
+      logo.src = isClaro
+        ? "https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas_cinza.jpg"
+        : "https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg";
+    }
+
+    const temaAtual = localStorage.getItem("theme") || "dark";
+    aplicarTema(temaAtual);
 
     toggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("light");
-      localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
+      const novoTema = document.body.classList.contains("light") ? "dark" : "light";
+      aplicarTema(novoTema);
     });
 
     const path = window.location.pathname.replace(/^\/|\/$/g, "");
