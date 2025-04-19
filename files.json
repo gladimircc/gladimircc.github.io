@@ -45,6 +45,11 @@
     "type": "file"
   },
   {
+    "name": "unisenac_campus_pelotas_cinza.jpg",
+    "path": "identidade_visual/unisenac_campus_pelotas_cinza.jpg",
+    "type": "file"
+  },
+  {
     "name": "exemplo.txt",
     "path": "teste/exemplo.txt",
     "type": "file"
