@@ -1,30 +1,27 @@
-// gerar-arvore.js
-const fs = require('fs');
-const { globby } = require('globby');
+// gerar-arvore.mjs
+import fs from 'fs';
+import { globby } from 'globby';
 
-(async () => {
-  const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**'], {
-    onlyFiles: false, // 👈 isso garante que pastas também venham na listagem
-  });
+const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**'], {
+  onlyFiles: false,
+});
 
-  const pastas = new Set();
-  const arquivos = [];
+const pastas = new Set();
+const arquivos = [];
 
-  entries.forEach((entry) => {
-    const stat = fs.statSync(entry);
+entries.forEach((entry) => {
+  const stat = fs.statSync(entry);
+  if (stat.isDirectory()) {
+    pastas.add(entry);
+  } else if (stat.isFile()) {
+    arquivos.push(entry);
+  }
+});
 
-    if (stat.isDirectory()) {
-      pastas.add(entry);
-    } else if (stat.isFile()) {
-      arquivos.push(entry);
-    }
-  });
+const estrutura = {
+  pastas: Array.from(pastas).sort(),
+  arquivos: arquivos.sort()
+};
 
-  const estrutura = {
-    pastas: Array.from(pastas).sort(),
-    arquivos: arquivos.sort()
-  };
-
-  fs.writeFileSync('files.json', JSON.stringify(estrutura, null, 2));
-  console.log('✅ Arquivo files.json gerado com sucesso!');
-})();
+fs.writeFileSync('files.json', JSON.stringify(estrutura, null, 2));
+console.log('✅ Arquivo files.json gerado com sucesso!');
