@@ -2,142 +2,142 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Prof. Gladimir Ceroni Catarino</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
+  <title>Prof. Gladimir Ceroni Catarino</title>
   <style>
-    :root {
-      --bg: #000;
-      --fg: #33ff33;
-      --folder: #ff66ff;
-      --file: #3399ff;
-    }
-    [data-theme="light"] {
-      --bg: #f4f4f4;
-      --fg: #000;
-      --folder: #d6336c;
-      --file: #0077cc;
-    }
     body {
+      background-color: #000;
+      color: #33ff33;
       font-family: monospace;
-      background-color: var(--bg);
-      color: var(--fg);
-      margin: 0;
-      padding: 0;
+      padding: 1rem;
     }
-    header {
-      background-color: var(--bg);
-      color: var(--fg);
-      padding: 20px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
     .logo {
-      height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
-    .terminal {
-      padding: 20px;
-      white-space: pre-wrap;
-      max-width: 1000px;
-      margin: auto;
+    .breadcrumb {
+      margin: 1rem 0;
+      color: #66ff66;
     }
-    .folder { color: var(--folder); }
-    .file { color: var(--file); }
-    a { color: inherit; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .breadcrumb a { margin-right: 4px; text-decoration: underline; }
-    .stats { margin-top: 1em; font-size: 14px; opacity: 0.8; }
-    .toggle-btn {
-      background: none;
-      color: var(--fg);
-      border: 1px solid var(--fg);
-      padding: 5px 10px;
+    .breadcrumb a {
+      color: #66ff66;
+    }
+    .file-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .file-list li {
+      margin: 0.25rem 0;
+    }
+    .folder::before {
+      content: "📁 ";
+    }
+    .file::before {
+      content: "📄 ";
+    }
+    .info {
+      margin-top: 1rem;
+      color: #999;
+    }
+    .back {
+      margin-bottom: 1rem;
+      display: inline-block;
+      color: #33ff33;
       cursor: pointer;
-      border-radius: 5px;
+    }
+    .toggle-theme {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      cursor: pointer;
+      background: #222;
+      color: #33ff33;
+      padding: 0.5rem 1rem;
+      border: 1px solid #33ff33;
+      font-size: 0.9rem;
+    }
+    .light-theme {
+      background-color: #fff;
+      color: #000;
+    }
+    .light-theme .toggle-theme {
+      background: #eee;
+      color: #000;
+      border: 1px solid #000;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="identidade_visual/unisenac_campus_pelotas2.jpg" class="logo" alt="Logo UniSENAC">
+  <div class="logo">
+    <img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" width="120">
     <h1>Prof. Gladimir Ceroni Catarino</h1>
-    <button class="toggle-btn" onclick="toggleTheme()">🌓 Tema</button>
-  </header>
-
-  <div class="terminal">
-    <div class="breadcrumb" id="breadcrumb"></div>
-    <div id="fileList"></div>
-    <div class="stats" id="stats"></div>
   </div>
 
+  <div class="back" onclick="goBack()">↩️ Voltar</div>
+
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <ul class="file-list" id="fileList"></ul>
+
+  <div class="info" id="info"></div>
+
+  <button class="toggle-theme" onclick="toggleTheme()">Alternar tema</button>
+
   <script>
-    let allFiles = [];
-    let currentPath = '';
+    const fileList = document.getElementById('fileList');
+    const breadcrumb = document.getElementById('breadcrumb');
+    const info = document.getElementById('info');
+    const pathAtual = decodeURIComponent(window.location.pathname.replace(/^\//, '').replace(/\/$/, ''));
 
-    function iconFor(path) {
-      const ext = path.split('.').pop().toLowerCase();
-      if (path.endsWith('/')) return '📁';
-      if (["jpg","png","gif","bmp","jpeg","svg"].includes(ext)) return '🖼️';
-      if (["mp3","wav","ogg"].includes(ext)) return '🎵';
-      if (["mp4","webm","avi"].includes(ext)) return '🎬';
-      if (["pdf"].includes(ext)) return '📄';
-      if (["zip","rar","7z"].includes(ext)) return '🗜️';
-      if (["txt","md"].includes(ext)) return '📃';
-      return '📄';
-    }
+    fetch('/files.json')
+      .then(res => res.json())
+      .then(data => {
+        const pastas = data.filter(f => f.type === 'folder' && f.path.startsWith(pathAtual));
+        const arquivos = data.filter(f => f.type === 'file' && f.path.startsWith(pathAtual));
 
-    function renderBreadcrumb(path) {
-      const parts = path.split('/').filter(Boolean);
-      let html = '<a href="#">↩️</a> <a href="#">~/</a>';
-      let fullPath = '';
-      for (let i = 0; i < parts.length; i++) {
-        fullPath += (i > 0 ? '/' : '') + parts[i];
-        html += `<a href="#${encodeURIComponent(fullPath)}">${parts[i]}/</a>`;
-      }
-      document.getElementById('breadcrumb').innerHTML = html;
-    }
+        const nivel = pathAtual ? pathAtual.split('/') : [];
+        let base = '';
+        breadcrumb.innerHTML = '<a href="/">~/</a>' + nivel.map((p, i) => {
+          base += (i === 0 ? '' : '/') + p;
+          return ` / <a href="/${base}/">${p}</a>`;
+        }).join('');
 
-    function renderList() {
-      const list = document.getElementById('fileList');
-      const path = location.hash ? decodeURIComponent(location.hash.substring(1)) : '';
-      currentPath = path;
-      const prefix = path ? path + '/' : '';
-      const items = allFiles.filter(e => e.path.startsWith(prefix) && !e.path.slice(prefix.length).includes('/'));
-      const stats = document.getElementById('stats');
+        fileList.innerHTML = '';
+        const todos = [...pastas, ...arquivos]
+          .filter(f => f.path.split('/').length === (pathAtual ? pathAtual.split('/').length + 1 : 1))
+          .sort((a, b) => a.name.localeCompare(b.name));
 
-      renderBreadcrumb(path);
-      list.innerHTML = '';
-      items.forEach(e => {
-        const icon = iconFor(e.path);
-        const line = document.createElement('div');
-        if (e.type === 'folder') {
-          const target = encodeURIComponent(e.path);
-          line.innerHTML = `<span class="folder">${icon} <a href="#${target}">${e.name}</a></span>`;
-        } else {
-          line.innerHTML = `<span class="file">${icon} <a href="${e.path}" target="_blank">${e.name}</a></span>`;
-        }
-        list.appendChild(line);
+        todos.forEach(entry => {
+          const li = document.createElement('li');
+          li.className = entry.type;
+          const a = document.createElement('a');
+          a.href = (entry.type === 'folder' ? `/${entry.path}/` : `/${entry.path}`);
+          a.textContent = entry.name;
+          li.appendChild(a);
+          fileList.appendChild(li);
+        });
+
+        info.textContent = `${pastas.length} pasta(s), ${arquivos.length} arquivo(s)`;
       });
-      const numFolders = items.filter(e => e.type === 'folder').length;
-      const numFiles = items.filter(e => e.type === 'file').length;
-      stats.textContent = `${numFolders} pastas e ${numFiles} arquivos`;
+
+    function goBack() {
+      const split = pathAtual.split('/');
+      split.pop();
+      const back = '/' + split.join('/') + '/';
+      window.location.href = back === '//' ? '/' : back;
     }
 
     function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      document.documentElement.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+      document.body.classList.toggle('light-theme');
     }
-
-    window.addEventListener('hashchange', renderList);
-
-    fetch('files.json')
-      .then(resp => resp.json())
-      .then(data => {
-        allFiles = data;
-        renderList();
-      });
   </script>
 </body>
 </html>
