@@ -6,6 +6,7 @@ const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!fi
   onlyFiles: false,
 });
 
+
 const pastas = new Set();
 const arquivos = [];
 
