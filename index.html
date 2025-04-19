@@ -4,83 +4,95 @@
   <meta charset="UTF-8">
   <title>Prof. Gladimir Ceroni Catarino</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
   <style>
     body {
+      background-color: #000;
+      color: #33ff33;
       font-family: monospace;
-      background-color: #000;
-      color: #33ff33;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
-    header {
-      background-color: #000;
+    .breadcrumb a {
       color: #33ff33;
-      padding: 20px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      text-decoration: none;
     }
-    header img.logo {
-      width: 160px;
-      margin-right: 15px;
+    .breadcrumb a:hover {
+      text-decoration: underline;
     }
-    h1 { font-size: 24px; }
-    .terminal {
-      padding: 20px;
-      white-space: pre-wrap;
-      max-width: 900px;
-      margin: auto;
+    .item {
+      padding: 5px 0;
     }
-    .dir { color: #ff66ff; }
+    .folder { color: #ff66ff; }
     .file { color: #3399ff; }
-    .time-box {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px;
-      font-size: 16px;
+    .clock {
+      position: fixed;
+      top: 10px;
+      right: 10px;
       border: 1px solid #33ff33;
-      background-color: rgba(0, 0, 0, 0.6);
+      padding: 5px 10px;
     }
-    a { color: inherit; text-decoration: none; }
-    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo Uni SENAC" class="logo">    
-    <h1>Prof. Gladimir Ceroni Catarino</h1>
-  </header>
 
-  <div class="time-box" id="horaAtual"></div>
-
-  <div class="terminal" id="terminalView"></div>
+  <h1>📁 Prof. Gladimir Ceroni Catarino</h1>
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <div class="clock" id="horaAtual"></div>
+  <div id="fileList"></div>
 
   <script>
+    async function carregarArquivos(caminho = '') {
+      const res = await fetch('files.json');
+      const estrutura = await res.json();
+
+      const partes = caminho ? caminho.split('/') : [];
+      let atual = estrutura;
+
+      for (const parte of partes) {
+        const pasta = atual.find(e => e.name === parte && e.type === 'folder');
+        if (!pasta) return;
+        atual = pasta.children || [];
+      }
+
+      document.getElementById('breadcrumb').innerHTML = gerarBreadcrumb(partes);
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+
+      atual.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item ' + item.type;
+        if (item.type === 'folder') {
+          div.innerHTML = `<span class="folder">📁 <a href="?path=${caminho ? caminho + '/' : ''}${item.name}">${item.name}</a></span>`;
+        } else {
+          div.innerHTML = `<span class="file">📄 <a href="${item.path.replace(/^.*?\/(gladimircc\.github\.io\/)?/, '')}">${item.name}</a></span>`;
+        }
+        fileList.appendChild(div);
+      });
+    }
+
+    function gerarBreadcrumb(partes) {
+      let caminho = '';
+      const links = [`<a href="?">~/</a>`];
+      partes.forEach((parte, i) => {
+        caminho += (i > 0 ? '/' : '') + parte;
+        links.push(`<a href="?path=${caminho}">${parte}</a>`);
+      });
+      return links.join(' / ');
+    }
+
     function atualizarHora() {
       const agora = new Date();
-      const horas = String(agora.getHours()).padStart(2, '0');
-      const minutos = String(agora.getMinutes()).padStart(2, '0');
-      const segundos = String(agora.getSeconds()).padStart(2, '0');
-      document.getElementById('horaAtual').textContent = horas + ':' + minutos + ':' + segundos;
+      const h = agora.getHours().toString().padStart(2, '0');
+      const m = agora.getMinutes().toString().padStart(2, '0');
+      const s = agora.getSeconds().toString().padStart(2, '0');
+      document.getElementById('horaAtual').textContent = `${h}:${m}:${s}`;
     }
+
+    const url = new URL(window.location.href);
+    const caminho = url.searchParams.get('path') || '';
+    carregarArquivos(caminho);
     setInterval(atualizarHora, 1000);
     atualizarHora();
-
-    fetch('files.json')
-      .then(response => response.json())
-      .then(data => {
-        const terminal = document.getElementById('terminalView');
-        terminal.innerHTML += '┌─(Gladimir@GitHubPages)-[~/]\n';
-        data.pastas.forEach(p => {
-          terminal.innerHTML += '<span class="dir">&lt;DIR&gt; 📁 <a href="' + p + '/">' + p + '</a></span>\n';
-        });
-        data.arquivos.forEach(f => {
-          terminal.innerHTML += '<span class="file">📄 <a href="' + f + '">' + f + '</a></span>\n';
-        });
-      });
   </script>
 </body>
 </html>
