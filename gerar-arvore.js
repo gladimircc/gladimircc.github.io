@@ -2,9 +2,10 @@
 const fs = require('fs');
 const { globby } = require('globby');
 
-
 (async () => {
-  const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**']);
+  const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**'], {
+    onlyFiles: false, // 👈 isso garante que pastas também venham na listagem
+  });
 
   const pastas = new Set();
   const arquivos = [];
