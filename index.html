@@ -10,6 +10,7 @@
       --text-color: #33ff33;
       --link-color: #3399ff;
       --dir-color: #ff66ff;
+      --logo-url: url('https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg');
     }
 
     body.light {
@@ -17,6 +18,7 @@
       --text-color: #222;
       --link-color: #0077cc;
       --dir-color: #bb00bb;
+      --logo-url: url('https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas_cinza.jpg');
     }
 
     body {
@@ -26,7 +28,6 @@
       font-size: 1.1em;
       margin: 0;
       padding: 20px;
-      transition: background-color 0.4s, color 0.4s;
     }
 
     a {
@@ -42,16 +43,15 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      transition: transform 0.3s ease;
     }
 
-    .logo img {
+    .logo-img {
+      width: 160px;
       height: 60px;
-      transition: height 0.4s ease;
-    }
-
-    body.light .logo img {
-      height: 70px;
+      background-image: var(--logo-url);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
     }
 
     .breadcrumb {
@@ -85,7 +85,6 @@
       background: transparent;
       color: var(--text-color);
       cursor: pointer;
-      transition: all 0.3s ease;
     }
 
     .back-link {
@@ -98,7 +97,7 @@
   <button id="themeToggle">Alternar tema</button>
 
   <div class="logo">
-    <img id="logoImg" src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" />
+    <div class="logo-img" aria-hidden="true"></div>
     <h1>Prof. Gladimir Ceroni Catarino</h1>
   </div>
 
@@ -109,29 +108,21 @@
   <p id="contador"></p>
 
   <script>
-    const logo = document.getElementById("logoImg");
+    // Alternar tema
     const toggleBtn = document.getElementById("themeToggle");
-
-    function aplicarTema(tema) {
-      const isClaro = tema === "light";
-      document.body.classList.toggle("light", isClaro);
-      localStorage.setItem("theme", tema);
-      logo.src = isClaro
-        ? "https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas_cinza.jpg"
-        : "https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg";
-    }
-
-    const temaAtual = localStorage.getItem("theme") || "dark";
-    aplicarTema(temaAtual);
+    const currentTheme = localStorage.getItem("theme") || "dark";
+    document.body.classList.toggle("light", currentTheme === "light");
 
     toggleBtn.addEventListener("click", () => {
-      const novoTema = document.body.classList.contains("light") ? "dark" : "light";
-      aplicarTema(novoTema);
+      document.body.classList.toggle("light");
+      localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
     });
 
+    // Caminho atual
     const path = window.location.pathname.replace(/^\/|\/$/g, "");
     const pastaAtual = path || "~";
 
+    // Breadcrumb dinâmico com ícones 📁
     const breadcrumb = document.getElementById("breadcrumb");
     const partes = pastaAtual === "~" ? [] : pastaAtual.split("/");
     if (partes.length === 0) {
@@ -145,11 +136,13 @@
       });
     }
 
+    // Link para voltar
     const backLink = document.getElementById("backLink");
     const upDir = path.split("/").slice(0, -1).join("/");
     backLink.href = "/" + upDir;
     if (pastaAtual === "~") backLink.style.display = "none";
 
+    // Carregar lista de arquivos
     fetch("/files.json")
       .then((r) => r.json())
       .then((data) => {
