@@ -10,89 +10,88 @@
       color: #33ff33;
       font-family: monospace;
       margin: 0;
-      padding: 20px;
+      padding: 1rem;
     }
-    .breadcrumb a {
-      color: #33ff33;
-      text-decoration: none;
+    h1 {
+      color: #00ff00;
     }
-    .breadcrumb a:hover {
-      text-decoration: underline;
+    .breadcrumb {
+      margin-bottom: 1rem;
+      color: #ccc;
+    }
+    .breadcrumb span {
+      margin-right: 5px;
     }
     .item {
-      padding: 5px 0;
+      margin: 5px 0;
     }
-    .folder { color: #ff66ff; }
-    .file { color: #3399ff; }
-    .clock {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      border: 1px solid #33ff33;
-      padding: 5px 10px;
+    .folder::before {
+      content: "📁 ";
+    }
+    .file::before {
+      content: "📄 ";
+    }
+    a {
+      color: #3399ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-
   <h1>📁 Prof. Gladimir Ceroni Catarino</h1>
   <div class="breadcrumb" id="breadcrumb"></div>
-  <div class="clock" id="horaAtual"></div>
-  <div id="fileList"></div>
+  <div id="listagem"></div>
 
   <script>
     async function carregarArquivos(caminho = '') {
       const res = await fetch('files.json');
-      const estrutura = await res.json();
+      const dados = await res.json();
 
-      const partes = caminho ? caminho.split('/') : [];
-      let atual = estrutura;
+      const pastaAtual = caminho ? caminho + '/' : '';
+      const container = document.getElementById('listagem');
+      const breadcrumb = document.getElementById('breadcrumb');
+      container.innerHTML = '';
 
-      for (const parte of partes) {
-        const pasta = atual.find(e => e.name === parte && e.type === 'folder');
-        if (!pasta) return;
-        atual = pasta.children || [];
-      }
-
-      document.getElementById('breadcrumb').innerHTML = gerarBreadcrumb(partes);
-      const fileList = document.getElementById('fileList');
-      fileList.innerHTML = '';
-
-      atual.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item ' + item.type;
-        if (item.type === 'folder') {
-          div.innerHTML = `<span class="folder">📁 <a href="?path=${caminho ? caminho + '/' : ''}${item.name}">${item.name}</a></span>`;
-        } else {
-          div.innerHTML = `<span class="file">📄 <a href="${item.path.replace(/^.*?\/(gladimircc\.github\.io\/)?/, '')}">${item.name}</a></span>`;
-        }
-        fileList.appendChild(div);
-      });
-    }
-
-    function gerarBreadcrumb(partes) {
-      let caminho = '';
-      const links = [`<a href="?">~/</a>`];
+      // Atualiza breadcrumb
+      const partes = caminho.split('/').filter(p => p);
+      let acumulador = '';
+      breadcrumb.innerHTML = '<span><a href="#" onclick="carregarArquivos(\'\')">~/</a></span>';
       partes.forEach((parte, i) => {
-        caminho += (i > 0 ? '/' : '') + parte;
-        links.push(`<a href="?path=${caminho}">${parte}</a>`);
+        acumulador += (i ? '/' : '') + parte;
+        breadcrumb.innerHTML += `<span>/<a href="#" onclick="carregarArquivos('${acumulador}')">${parte}</a></span>`;
       });
-      return links.join(' / ');
+
+      // Filtra por caminho
+      const itens = dados.filter(item => {
+        const path = item.path;
+        const dir = path.substring(0, path.lastIndexOf('/'));
+        return (item.type === 'folder' && path === pastaAtual + item.name) ||
+               (item.type === 'file' && dir === caminho);
+      });
+
+      // Ordena: pastas primeiro
+      itens.sort((a, b) => {
+        if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      // Exibe
+      itens.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `item ${item.type}`;
+        if (item.type === 'folder') {
+          div.innerHTML = `<a href="#" onclick="carregarArquivos('${item.path}')">${item.name}</a>`;
+        } else {
+          div.innerHTML = `<a href="${item.path}" target="_blank">${item.name}</a>`;
+        }
+        container.appendChild(div);
+      });
     }
 
-    function atualizarHora() {
-      const agora = new Date();
-      const h = agora.getHours().toString().padStart(2, '0');
-      const m = agora.getMinutes().toString().padStart(2, '0');
-      const s = agora.getSeconds().toString().padStart(2, '0');
-      document.getElementById('horaAtual').textContent = `${h}:${m}:${s}`;
-    }
-
-    const url = new URL(window.location.href);
-    const caminho = url.searchParams.get('path') || '';
-    carregarArquivos(caminho);
-    setInterval(atualizarHora, 1000);
-    atualizarHora();
+    carregarArquivos();
   </script>
 </body>
 </html>
