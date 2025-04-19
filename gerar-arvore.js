@@ -1,6 +1,7 @@
 // gerar-arvore.js
 const fs = require('fs');
-const globby = require('globby');
+const { globby } = require('globby');
+
 
 (async () => {
   const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**']);
