@@ -1,16 +1,11 @@
 // gerar-arvore.mjs
-import fs from 'node:fs';
+import fs from 'fs';
 import { globby } from 'globby';
 
-const entries = await globby([
-  '**/*',
-  '!**/node_modules/**',
-  '!**/.git/**',
-  '!files.json',
-  '!.github/**'
-], {
-  onlyFiles: false
-});
+const entries = await globby(
+  ['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**'],
+  { onlyFiles: false }
+);
 
 const pastas = new Set();
 const arquivos = [];
@@ -26,7 +21,7 @@ entries.forEach((entry) => {
 
 const estrutura = {
   pastas: Array.from(pastas).sort(),
-  arquivos: arquivos.sort()
+  arquivos: arquivos.sort(),
 };
 
 fs.writeFileSync('files.json', JSON.stringify(estrutura, null, 2));
