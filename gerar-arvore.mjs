@@ -1,5 +1,5 @@
 // gerar-arvore.mjs
-import fs from 'fs';
+import fs from 'node:fs';
 import { globby } from 'globby';
 
 const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**'], {
