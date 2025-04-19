@@ -60,6 +60,6 @@
     </div>
 
     <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTvgCi-MJ_vIrxlPItD2r0h7KmITLvEArGFrsI8EbCWU5JKwVH6K0LFBHI2p75UNHUKEFpKPC37qMc8/embed?start=true&loop=false&delayms=1000" 
-        allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 </body>
 </html>
