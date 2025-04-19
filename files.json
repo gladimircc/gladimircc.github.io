@@ -1,24 +1,77 @@
-{
-  "pastas": [
-    "SENAC",
-    "SENAC/UniSENAC",
-    "SENAC/escola",
-    "SENAC/tec",
-    "SENAC/teste",
-    "identidade_visual"
-  ],
-  "arquivos": [
-    "README.md",
-    "SENAC/UniSENAC/index.html",
-    "SENAC/escola/index.html",
-    "SENAC/index.html",
-    "SENAC/tec/index.hml",
-    "SENAC/teste/ddd.ttt",
-    "UniSENAC_Pel-Calendario_Acadêmico_2025.pdf",
-    "gerar-arvore.mjs",
-    "identidade_visual/unisenac_campus_pelotas2.jpg",
-    "index.html",
-    "package-lock.json",
-    "package.json"
-  ]
-}
+[
+  {
+    "name": "README.md",
+    "path": "README.md",
+    "type": "file"
+  },
+  {
+    "name": "SENAC",
+    "path": "SENAC",
+    "type": "folder"
+  },
+  {
+    "name": "UniSENAC_Pel-Calendario_Acadêmico_2025.pdf",
+    "path": "UniSENAC_Pel-Calendario_Acadêmico_2025.pdf",
+    "type": "file"
+  },
+  {
+    "name": "identidade_visual",
+    "path": "identidade_visual",
+    "type": "folder"
+  },
+  {
+    "name": "index.html",
+    "path": "index.html",
+    "type": "file"
+  },
+  {
+    "name": "UniSENAC",
+    "path": "SENAC/UniSENAC",
+    "type": "folder"
+  },
+  {
+    "name": "escola",
+    "path": "SENAC/escola",
+    "type": "folder"
+  },
+  {
+    "name": "index.html",
+    "path": "SENAC/index.html",
+    "type": "file"
+  },
+  {
+    "name": "tec",
+    "path": "SENAC/tec",
+    "type": "folder"
+  },
+  {
+    "name": "teste",
+    "path": "SENAC/teste",
+    "type": "folder"
+  },
+  {
+    "name": "unisenac_campus_pelotas2.jpg",
+    "path": "identidade_visual/unisenac_campus_pelotas2.jpg",
+    "type": "file"
+  },
+  {
+    "name": "index.html",
+    "path": "SENAC/escola/index.html",
+    "type": "file"
+  },
+  {
+    "name": "index.html",
+    "path": "SENAC/UniSENAC/index.html",
+    "type": "file"
+  },
+  {
+    "name": "index.hml",
+    "path": "SENAC/tec/index.hml",
+    "type": "file"
+  },
+  {
+    "name": "ddd.ttt",
+    "path": "SENAC/teste/ddd.ttt",
+    "type": "file"
+  }
+]
