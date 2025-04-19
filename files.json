@@ -35,11 +35,6 @@
     "type": "folder"
   },
   {
-    "name": "teste",
-    "path": "SENAC/teste",
-    "type": "folder"
-  },
-  {
     "name": "unisenac_campus_pelotas2.jpg",
     "path": "identidade_visual/unisenac_campus_pelotas2.jpg",
     "type": "file"
@@ -47,11 +42,6 @@
   {
     "name": "index.hml",
     "path": "SENAC/tec/index.hml",
-    "type": "file"
-  },
-  {
-    "name": "ddd.ttt",
-    "path": "SENAC/teste/ddd.ttt",
     "type": "file"
   }
 ]
