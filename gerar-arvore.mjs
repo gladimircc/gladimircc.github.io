@@ -2,7 +2,16 @@
 import fs from 'node:fs';
 import { globby } from 'globby';
 
-const entries = await globby(['**/*', '!**/node_modules/**', '!**/.git/**', '!files.json', '!.github/**', '!gerar-arvore.*', '!package*.json'], {
+const entries = await globby([
+  '**/*',
+  '!**/node_modules/**',
+  '!**/.git/**',
+  '!files.json',
+  '!.github/**',
+  '!gerar-arvore.*',
+  '!package*.json',
+  '!package-lock.json'
+], {
   onlyFiles: false
 });
 
