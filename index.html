@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Diretório de Gladimir</title>
+  <title>Prof. Gladimir Ceroni Catarino</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -12,6 +12,15 @@
       margin: 0;
       padding: 20px;
       transition: all 0.3s;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    header img {
+      height: 60px;
     }
     .breadcrumb a {
       color: #33ff33;
@@ -24,7 +33,6 @@
     .file-list {
       list-style: none;
       padding: 0;
-      margin-top: 10px;
     }
     .file-list li {
       font-size: 18px;
@@ -61,6 +69,11 @@
 <body class="dark">
   <button class="toggle" onclick="alternarTema()">🌞/🌙</button>
 
+  <header>
+    <img src="/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC">
+    <h1>Prof. Gladimir Ceroni Catarino</h1>
+  </header>
+
   <div class="breadcrumb" id="breadcrumb"></div>
   <div class="back" id="voltar"></div>
   <ul class="file-list" id="lista"></ul>
@@ -69,9 +82,9 @@
   <script>
     const especiais = ['/SENAC/UniSENAC', '/SENAC/tec', '/SENAC/escola'];
     const pastaAtual = window.location.pathname.replace(/\/$/, '');
+
     if (especiais.includes(pastaAtual)) {
-      // Se estiver numa pasta com index próprio, não carrega nada
-      console.log('Página especial. Index não sobreposto.');
+      document.body.innerHTML = '<h2 style="color:red; text-align:center">Esta página tem um index.html personalizado.</h2>';
     } else {
       fetch('/files.json')
         .then(r => r.json())
