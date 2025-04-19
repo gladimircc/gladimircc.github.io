@@ -6,106 +6,153 @@
   <title>Prof. Gladimir Ceroni Catarino</title>
   <style>
     :root {
-      --bg: #000;
-      --text: #33ff33;
-      --link: #66f;
+      --bg-color: #000;
+      --text-color: #33ff33;
+      --link-color: #3399ff;
+      --dir-color: #ff66ff;
     }
-    [data-theme='light'] {
-      --bg: #fff;
-      --text: #000;
-      --link: #00f;
+
+    body.light {
+      --bg-color: #fff;
+      --text-color: #222;
+      --link-color: #0077cc;
+      --dir-color: #bb00bb;
     }
+
     body {
-      margin: 0;
-      padding: 1em;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       font-family: monospace;
-      background-color: var(--bg);
-      color: var(--text);
+      font-size: 1.1em;
+      margin: 0;
+      padding: 20px;
     }
+
     a {
-      color: var(--link);
+      color: inherit;
       text-decoration: none;
     }
-    a:hover { text-decoration: underline; }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
     .logo {
       display: flex;
       align-items: center;
-      gap: 1em;
+      gap: 10px;
     }
-    .logo img { height: 60px; }
+
+    .logo img {
+      height: 60px;
+    }
+
     .breadcrumb {
-      margin: 1em 0;
+      margin: 10px 0;
+      font-size: 1.3em;
     }
-    .toggle-theme {
+
+    .breadcrumb a {
+      color: var(--link-color);
+    }
+
+    .entry {
+      margin: 5px 0;
+      font-size: 1.15em;
+    }
+
+    .folder {
+      color: var(--dir-color);
+    }
+
+    .file {
+      color: var(--link-color);
+    }
+
+    #themeToggle {
       position: absolute;
-      top: 1em;
-      right: 1em;
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--text);
+      top: 20px;
+      right: 20px;
       padding: 5px 10px;
+      border: 1px solid var(--text-color);
+      background: transparent;
+      color: var(--text-color);
       cursor: pointer;
     }
-    .listagem { margin-top: 2em; }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <button class="toggle-theme" onclick="alternarTema()">Alternar tema</button>
+  <button id="themeToggle">Alternar tema</button>
+
   <div class="logo">
     <img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" />
     <h1>Prof. Gladimir Ceroni Catarino</h1>
   </div>
-  <div class="breadcrumb" id="breadcrumb">~/</div>
-  <div class="listagem" id="terminal"></div>
+
+  <div id="breadcrumb" class="breadcrumb"></div>
+  <a id="backLink" class="back-link" href="#">↩️ Voltar</a>
+
+  <pre id="lista"></pre>
+  <p id="contador"></p>
 
   <script>
-    const temaAtual = localStorage.getItem('tema');
-    if (temaAtual) document.documentElement.setAttribute('data-theme', temaAtual);
+    const toggleBtn = document.getElementById("themeToggle");
+    const currentTheme = localStorage.getItem("theme") || "dark";
+    document.body.classList.toggle("light", currentTheme === "light");
 
-    function alternarTema() {
-      const tema = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', tema);
-      localStorage.setItem('tema', tema);
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
+    });
+
+    const path = window.location.pathname.replace(/^\/|\/$/g, "");
+    const pastaAtual = path || "~";
+
+    const breadcrumb = document.getElementById("breadcrumb");
+    const partes = pastaAtual === "~" ? [] : pastaAtual.split("/");
+    if (partes.length === 0) {
+      breadcrumb.innerHTML = `📁 <a href="/">~</a>`;
+    } else {
+      let acumulador = "";
+      breadcrumb.innerHTML = `📁 <a href="/">~</a>`;
+      partes.forEach((parte, i) => {
+        acumulador += "/" + parte;
+        breadcrumb.innerHTML += ` / <a href="${acumulador}/">${parte}</a>`;
+      });
     }
 
-    let pathAtual = decodeURIComponent(window.location.pathname.slice(1));
-    const redirecionado = sessionStorage.getItem('redirectPath');
-    if (redirecionado) {
-      pathAtual = redirecionado.slice(1);
-      sessionStorage.removeItem('redirectPath');
-    }
+    const backLink = document.getElementById("backLink");
+    const upDir = path.split("/").slice(0, -1).join("/");
+    backLink.href = "/" + upDir;
+    if (pastaAtual === "~") backLink.style.display = "none";
 
-    fetch('/files.json')
-      .then(r => r.json())
-      .then(data => {
-        const terminal = document.getElementById('terminal');
-        const breadcrumb = document.getElementById('breadcrumb');
+    fetch("/files.json")
+      .then((r) => r.json())
+      .then((data) => {
+        const container = document.getElementById("lista");
 
-        const caminhos = pathAtual.split('/').filter(Boolean);
-        let caminhoAcumulado = '';
-        breadcrumb.innerHTML = caminhos.length > 0 ? '<a href="/">~/</a>' : '~/';
-        caminhos.forEach((p, i) => {
-          caminhoAcumulado += (i === 0 ? '' : '/') + p;
-          breadcrumb.innerHTML += ` / <a href="/${caminhoAcumulado}/">${p}</a>`;
+        const entries = data.filter((item) => {
+          if (pastaAtual === "~") return !item.path.includes("/");
+          return item.path.startsWith(pastaAtual + "/") && item.path.split("/").length === pastaAtual.split("/").length + 1;
         });
 
-        const arquivos = data.filter(e => e.path.startsWith(pathAtual)).filter(e => {
-          const resto = e.path.slice(pathAtual.length).replace(/^\//, '');
-          return resto.split('/').length === 1;
-        });
+        const pastas = entries.filter(e => e.type === "folder").sort((a, b) => a.name.localeCompare(b.name));
+        const arquivos = entries.filter(e => e.type === "file").sort((a, b) => a.name.localeCompare(b.name));
 
-        const totalPastas = arquivos.filter(f => f.type === 'folder').length;
-        const totalArquivos = arquivos.filter(f => f.type === 'file').length;
+        pastas.forEach(e => {
+          container.innerHTML += `<div class="entry folder">📁 <a href="${e.name}/">${e.name}</a></div>`;
+        });
 
         arquivos.forEach(e => {
-          const link = document.createElement('div');
-          const icone = e.type === 'folder' ? '📁' : '📄';
-          const barra = pathAtual ? '/' : '';
-          link.innerHTML = `${icone} <a href="${barra + e.path}">${e.name}</a>`;
-          terminal.appendChild(link);
+          container.innerHTML += `<div class="entry file">📄 <a href="/${e.path}">${e.name}</a></div>`;
         });
 
-        terminal.innerHTML += `<p>${totalPastas} pasta(s), ${totalArquivos} arquivo(s)</p>`;
+        document.getElementById("contador").textContent = `${pastas.length} pasta(s), ${arquivos.length} arquivo(s)`;
       });
   </script>
 </body>
