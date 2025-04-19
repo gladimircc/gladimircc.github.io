@@ -2,124 +2,95 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prof. Gladimir Ceroni Catarino</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <style>
     body {
-      background-color: black;
-      color: #33ff33;
       font-family: monospace;
-      padding: 20px;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .logo {
-      height: 60px;
-      margin-right: 20px;
-    }
-    h1 {
-      font-size: 24px;
+      background-color: #000;
+      color: #33ff33;
       margin: 0;
-    }
-    .iframe-wrapper {
-      border: 1px solid #33ff33;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    iframe {
-      width: 100%;
-      max-width: 640px;
-      height: 360px;
-    }
-    .time-box {
-      font-size: 16px;
-      margin-bottom: 20px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid #33ff33;
-      display: inline-block;
-      padding: 5px 10px;
-    }
-    ul {
-      list-style: none;
       padding: 0;
     }
-    li {
-      margin: 5px 0;
+    header {
+      background-color: #000;
+      color: #33ff33;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .dir a {
-      color: #ff66ff;
-      text-decoration: none;
+    header img.logo {
+      width: 160px;
+      margin-right: 15px;
     }
-    .file a {
-      color: #3399ff;
-      text-decoration: none;
+    h1 { font-size: 24px; }
+    iframe {
+      display: block;
+      margin: 20px auto;
+      border: 1px solid #33ff33;
+      max-width: 640px;
+      width: 90%;
     }
-    .dir::before {
-      content: "<DIR> ";
-      color: #00ff00;
+    .terminal {
+      padding: 20px;
+      white-space: pre-wrap;
+      max-width: 900px;
+      margin: auto;
     }
-    .file::before {
-      content: "     ";
+    .dir { color: #ff66ff; }
+    .file { color: #3399ff; }
+    .time-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #33ff33;
+      background-color: rgba(0, 0, 0, 0.6);
     }
-    .file a:hover, .dir a:hover {
-      color: #ffcc00;
-    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <header>
-    <img src="docs/Identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo Uni SENAC" class="logo">
+    <img src="https://gladimircc.github.io/docs/Identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo Uni SENAC" class="logo">
     <h1>Prof. Gladimir Ceroni Catarino</h1>
   </header>
 
-  <div class="iframe-wrapper">
-    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTvgCi-MJ_vIrxlPItD2r0h7KmITLvEArGFrsI8EbCWU5JKwVH6K0LFBHI2p75UNHUKEFpKPC37qMc8/embed?start=false&loop=false&delayms=3000" allowfullscreen></iframe>
-  </div>
-
   <div class="time-box" id="horaAtual"></div>
 
-  <ul id="listagem"></ul>
+  <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTvgCi-MJ_vIrxlPItD2r0h7KmITLvEArGFrsI8EbCWU5JKwVH6K0LFBHI2p75UNHUKEFpKPC37qMc8/embed?start=false&loop=false&delayms=3000"
+    allowfullscreen></iframe>
+
+  <div class="terminal" id="terminalView"></div>
 
   <script>
     function atualizarHora() {
       const agora = new Date();
-      const h = String(agora.getHours()).padStart(2, '0');
-      const m = String(agora.getMinutes()).padStart(2, '0');
-      const s = String(agora.getSeconds()).padStart(2, '0');
-      document.getElementById('horaAtual').textContent = `Hora atual: ${h}:${m}:${s}`;
+      const horas = String(agora.getHours()).padStart(2, '0');
+      const minutos = String(agora.getMinutes()).padStart(2, '0');
+      const segundos = String(agora.getSeconds()).padStart(2, '0');
+      document.getElementById('horaAtual').textContent = horas + ':' + minutos + ':' + segundos;
     }
     setInterval(atualizarHora, 1000);
     atualizarHora();
 
-    const arquivos = [
-      { nome: '2025-1', tipo: 'dir' },
-      { nome: 'bd', tipo: 'dir' },
-      { nome: 'docs', tipo: 'dir' },
-      { nome: 'escola', tipo: 'dir' },
-      { nome: 'flip', tipo: 'dir' },
-      { nome: 'horarios', tipo: 'dir' },
-      { nome: 'horariostech', tipo: 'dir' },
-      { nome: 'inauguracao', tipo: 'dir' },
-      { nome: 'iot', tipo: 'dir' },
-      { nome: 'isos', tipo: 'dir' },
-      { nome: 'tools', tipo: 'dir' },
-      { nome: 'unity', tipo: 'dir' },
-      { nome: 'UniSENAC_Pel-Calendario_Acadêmico_2025.pdf', tipo: 'file' }
-    ];
-
-    const listagem = document.getElementById('listagem');
-    arquivos.forEach(arq => {
-      const li = document.createElement('li');
-      li.className = arq.tipo;
-      const a = document.createElement('a');
-      a.href = `./${arq.nome}`;
-      a.textContent = ` ${arq.nome}`;
-      li.appendChild(a);
-      listagem.appendChild(li);
-    });
+    fetch('files.json')
+      .then(response => response.json())
+      .then(data => {
+        const terminal = document.getElementById('terminalView');
+        terminal.innerHTML += '┌─(Mussum)-[~gladimir]\n';
+        data.pastas.forEach(p => {
+          terminal.innerHTML += '<span class="dir">&lt;DIR&gt; 📁 <a href="' + p + '/">' + p + '</a></span>\n';
+        });
+        data.arquivos.forEach(f => {
+          terminal.innerHTML += '<span class="file">📄 <a href="' + f + '">' + f + '</a></span>\n';
+        });
+      });
   </script>
 </body>
 </html>
