@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prof. Gladimir Ceroni Catarino</title>
+  <style>
+    :root {
+      --bg: #000;
+      --text: #33ff33;
+      --link: #66f;
+    }
+    [data-theme='light'] {
+      --bg: #fff;
+      --text: #000;
+      --link: #00f;
+    }
+    body {
+      margin: 0;
+      padding: 1em;
+      font-family: monospace;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+    .logo img { height: 60px; }
+    .breadcrumb {
+      margin: 1em 0;
+    }
+    .toggle-theme {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--text);
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .listagem { margin-top: 2em; }
+  </style>
+</head>
+<body>
+  <button class="toggle-theme" onclick="alternarTema()">Alternar tema</button>
+  <div class="logo">
+    <img src="https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg" alt="Logo UniSENAC" />
+    <h1>Prof. Gladimir Ceroni Catarino</h1>
+  </div>
+  <div class="breadcrumb" id="breadcrumb">~/</div>
+  <div class="listagem" id="terminal"></div>
+
+  <script>
+    const temaAtual = localStorage.getItem('tema');
+    if (temaAtual) document.documentElement.setAttribute('data-theme', temaAtual);
+
+    function alternarTema() {
+      const tema = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', tema);
+      localStorage.setItem('tema', tema);
+    }
+
+    let pathAtual = decodeURIComponent(window.location.pathname.slice(1));
+    const redirecionado = sessionStorage.getItem('redirectPath');
+    if (redirecionado) {
+      pathAtual = redirecionado.slice(1);
+      sessionStorage.removeItem('redirectPath');
+    }
+
+    fetch('/files.json')
+      .then(r => r.json())
+      .then(data => {
+        const terminal = document.getElementById('terminal');
+        const breadcrumb = document.getElementById('breadcrumb');
+
+        const caminhos = pathAtual.split('/').filter(Boolean);
+        let caminhoAcumulado = '';
+        breadcrumb.innerHTML = caminhos.length > 0 ? '<a href="/">~/</a>' : '~/';
+        caminhos.forEach((p, i) => {
+          caminhoAcumulado += (i === 0 ? '' : '/') + p;
+          breadcrumb.innerHTML += ` / <a href="/${caminhoAcumulado}/">${p}</a>`;
+        });
+
+        const arquivos = data.filter(e => e.path.startsWith(pathAtual)).filter(e => {
+          const resto = e.path.slice(pathAtual.length).replace(/^\//, '');
+          return resto.split('/').length === 1;
+        });
+
+        const totalPastas = arquivos.filter(f => f.type === 'folder').length;
+        const totalArquivos = arquivos.filter(f => f.type === 'file').length;
+
+        arquivos.forEach(e => {
+          const link = document.createElement('div');
+          const icone = e.type === 'folder' ? '📁' : '📄';
+          const barra = pathAtual ? '/' : '';
+          link.innerHTML = `${icone} <a href="${barra + e.path}">${e.name}</a>`;
+          terminal.appendChild(link);
+        });
+
+        terminal.innerHTML += `<p>${totalPastas} pasta(s), ${totalArquivos} arquivo(s)</p>`;
+      });
+  </script>
+</body>
+</html>
