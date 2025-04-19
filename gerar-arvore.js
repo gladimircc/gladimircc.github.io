@@ -9,18 +9,20 @@ const globby = require('globby');
   const arquivos = [];
 
   entries.forEach((entry) => {
-    if (entry.includes('/')) {
-      const parts = entry.split('/');
-      pastas.add(parts[0]);
-    } else {
+    const stat = fs.statSync(entry);
+
+    if (stat.isDirectory()) {
+      pastas.add(entry);
+    } else if (stat.isFile()) {
       arquivos.push(entry);
     }
   });
 
-  fs.writeFileSync('files.json', JSON.stringify({
+  const estrutura = {
     pastas: Array.from(pastas).sort(),
     arquivos: arquivos.sort()
-  }, null, 2));
+  };
 
-  console.log('✅ Arquivo files.json gerado!');
+  fs.writeFileSync('files.json', JSON.stringify(estrutura, null, 2));
+  console.log('✅ Arquivo files.json gerado com sucesso!');
 })();
