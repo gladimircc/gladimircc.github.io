@@ -27,13 +27,6 @@
       margin-right: 15px;
     }
     h1 { font-size: 24px; }
-    iframe {
-      display: block;
-      margin: 20px auto;
-      border: 1px solid #33ff33;
-      max-width: 640px;
-      width: 90%;
-    }
     .terminal {
       padding: 20px;
       white-space: pre-wrap;
@@ -63,9 +56,6 @@
 
   <div class="time-box" id="horaAtual"></div>
 
-  <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTvgCi-MJ_vIrxlPItD2r0h7KmITLvEArGFrsI8EbCWU5JKwVH6K0LFBHI2p75UNHUKEFpKPC37qMc8/embed?start=false&loop=false&delayms=3000"
-    allowfullscreen></iframe>
-
   <div class="terminal" id="terminalView"></div>
 
   <script>
@@ -83,7 +73,7 @@
       .then(response => response.json())
       .then(data => {
         const terminal = document.getElementById('terminalView');
-        terminal.innerHTML += '┌─(Mussum)-[~gladimir]\n';
+        terminal.innerHTML += '┌─(Gladimir@GitHubPages)-[~/]\n';
         data.pastas.forEach(p => {
           terminal.innerHTML += '<span class="dir">&lt;DIR&gt; 📁 <a href="' + p + '/">' + p + '</a></span>\n';
         });
