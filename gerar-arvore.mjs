@@ -19,6 +19,12 @@ const estrutura = [];
 
 for (const entry of entries) {
   const stat = fs.statSync(entry);
+
+  const isIndexHtml = entry.toLowerCase().endsWith('index.html');
+  const isJsonFile = entry.toLowerCase().endsWith('.json');
+
+  if (isIndexHtml || isJsonFile) continue;
+
   estrutura.push({
     name: entry.split('/').pop(),
     path: entry,
