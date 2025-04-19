@@ -23,6 +23,7 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       font-family: monospace;
+      font-size: 1.1em;
       margin: 0;
       padding: 20px;
     }
@@ -48,7 +49,7 @@
 
     .breadcrumb {
       margin: 10px 0;
-      font-size: 1.2em;
+      font-size: 1.3em;
     }
 
     .breadcrumb a {
@@ -57,6 +58,7 @@
 
     .entry {
       margin: 5px 0;
+      font-size: 1.15em;
     }
 
     .folder {
@@ -99,7 +101,6 @@
   <p id="contador"></p>
 
   <script>
-    // Alternar tema
     const toggleBtn = document.getElementById("themeToggle");
     const currentTheme = localStorage.getItem("theme") || "dark";
     document.body.classList.toggle("light", currentTheme === "light");
@@ -109,11 +110,9 @@
       localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
     });
 
-    // Caminho atual
     const path = window.location.pathname.replace(/^\/|\/$/g, "");
     const pastaAtual = path || "~";
 
-    // Breadcrumb dinâmico com ícones 📁
     const breadcrumb = document.getElementById("breadcrumb");
     const partes = pastaAtual === "~" ? [] : pastaAtual.split("/");
     if (partes.length === 0) {
@@ -127,13 +126,11 @@
       });
     }
 
-    // Link para voltar
     const backLink = document.getElementById("backLink");
     const upDir = path.split("/").slice(0, -1).join("/");
     backLink.href = "/" + upDir;
     if (pastaAtual === "~") backLink.style.display = "none";
 
-    // Carregar lista
     fetch("/files.json")
       .then((r) => r.json())
       .then((data) => {
