@@ -25,6 +25,11 @@
     "type": "folder"
   },
   {
+    "name": "2025-06-Tec.pdf",
+    "path": "SENAC/2025-06-Tec.pdf",
+    "type": "file"
+  },
+  {
     "name": "UniSENAC",
     "path": "SENAC/UniSENAC",
     "type": "folder"
