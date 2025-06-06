@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gladimir IoT Panel</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- ✅ Paho MQTT deve vir ANTES do uso -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
+
   <style>
     :root {
       --bg-color: #000;
@@ -50,12 +57,6 @@
       margin-top: 10px;
     }
   </style>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- ✅ Paho MQTT deve vir ANTES do uso -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
 </head>
 <body>
   <h1>🚀 Painel Gladimir – ESP32 + MQTT</h1>
@@ -79,14 +80,11 @@
     <canvas id="chartUmid" height="150"></canvas>
   </div>
 
-  <!-- Script principal -->
   <script>
-    // Elementos
     const mqttLog = document.getElementById("mosquittoLog");
     const tempSpan = document.getElementById("tempValue");
     const umidSpan = document.getElementById("umidValue");
 
-    // Gráfico de temperatura
     const ctxTemp = document.getElementById("chartTemp").getContext("2d");
     const chartTemp = new Chart(ctxTemp, {
       type: "line",
@@ -111,7 +109,6 @@
       }
     });
 
-    // Gráfico de umidade
     const ctxUmid = document.getElementById("chartUmid").getContext("2d");
     const chartUmid = new Chart(ctxUmid, {
       type: "line",
@@ -136,7 +133,6 @@
       }
     });
 
-    // MQTT
     const clientID = "mqttjs_" + Math.random().toString(16).substr(2, 8);
     const mqttClient = new Paho.MQTT.Client("broker.hivemq.com", 8884, clientID);
 
