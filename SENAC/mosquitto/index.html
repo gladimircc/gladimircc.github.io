@@ -50,6 +50,12 @@
       margin-top: 10px;
     }
   </style>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- ✅ Paho MQTT deve vir ANTES do uso -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
 </head>
 <body>
   <h1>🚀 Painel Gladimir – ESP32 + MQTT</h1>
@@ -73,11 +79,7 @@
     <canvas id="chartUmid" height="150"></canvas>
   </div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Paho MQTT -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
-
+  <!-- Script principal -->
   <script>
     // Elementos
     const mqttLog = document.getElementById("mosquittoLog");
