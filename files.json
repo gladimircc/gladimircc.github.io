@@ -40,6 +40,11 @@
     "type": "folder"
   },
   {
+    "name": "mosquitto",
+    "path": "SENAC/mosquitto",
+    "type": "folder"
+  },
+  {
     "name": "tec",
     "path": "SENAC/tec",
     "type": "folder"
