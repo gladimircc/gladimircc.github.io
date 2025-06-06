@@ -8,7 +8,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Paho MQTT deve vir ANTES do uso -->
+  <!-- Paho MQTT -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
 
   <style>
@@ -50,6 +50,11 @@
       color: var(--dir-color);
     }
 
+    .status {
+      color: yellow;
+      font-weight: bold;
+    }
+
     canvas {
       max-width: 100%;
       background-color: #111;
@@ -63,7 +68,7 @@
 
   <div class="mqtt-section">
     <h3>Conexão MQTT (HiveMQ)</h3>
-    <pre id="mosquittoLog">Aguardando conexão...</pre>
+    <pre id="mosquittoLog" class="status">🕐 Aguardando conexão...</pre>
 
     <div class="mqtt-buttons">
       <button onclick="enviarComando('Gladimir/led', 'liga')">Ligar Luz</button>
@@ -71,11 +76,11 @@
     </div>
 
     <div class="mqtt-values">
-      <p>Temperatura: <span id="tempValue">--</span> °C</p>
-      <p>Umidade: <span id="umidValue">--</span> %</p>
+      <p>🌡️ Temperatura: <span id="tempValue">--</span> °C</p>
+      <p>💧 Umidade: <span id="umidValue">--</span> %</p>
     </div>
 
-    <h3>Gráficos</h3>
+    <h3>📊 Gráficos</h3>
     <canvas id="chartTemp" height="150"></canvas>
     <canvas id="chartUmid" height="150"></canvas>
   </div>
@@ -85,86 +90,77 @@
     const tempSpan = document.getElementById("tempValue");
     const umidSpan = document.getElementById("umidValue");
 
+    // Chart.js - Temperatura
     const ctxTemp = document.getElementById("chartTemp").getContext("2d");
     const chartTemp = new Chart(ctxTemp, {
       type: "line",
-      data: {
-        labels: [],
-        datasets: [{
-          label: "Temperatura (°C)",
-          data: [],
-          borderColor: "#ff6666",
-          backgroundColor: "rgba(255, 100, 100, 0.2)",
-          tension: 0.2
-        }]
-      },
+      data: { labels: [], datasets: [{ label: "Temperatura (°C)", data: [], borderColor: "#ff6666", backgroundColor: "rgba(255, 100, 100, 0.2)", tension: 0.2 }] },
       options: {
         scales: {
           x: { ticks: { color: '#ccc' }, grid: { color: '#333' } },
           y: { ticks: { color: '#ccc' }, grid: { color: '#333' } }
         },
-        plugins: {
-          legend: { labels: { color: '#ccc' } }
-        }
+        plugins: { legend: { labels: { color: '#ccc' } } }
       }
     });
 
+    // Chart.js - Umidade
     const ctxUmid = document.getElementById("chartUmid").getContext("2d");
     const chartUmid = new Chart(ctxUmid, {
       type: "line",
-      data: {
-        labels: [],
-        datasets: [{
-          label: "Umidade (%)",
-          data: [],
-          borderColor: "#66ccff",
-          backgroundColor: "rgba(100, 200, 255, 0.2)",
-          tension: 0.2
-        }]
-      },
+      data: { labels: [], datasets: [{ label: "Umidade (%)", data: [], borderColor: "#66ccff", backgroundColor: "rgba(100, 200, 255, 0.2)", tension: 0.2 }] },
       options: {
         scales: {
           x: { ticks: { color: '#ccc' }, grid: { color: '#333' } },
           y: { ticks: { color: '#ccc' }, grid: { color: '#333' } }
         },
-        plugins: {
-          legend: { labels: { color: '#ccc' } }
-        }
+        plugins: { legend: { labels: { color: '#ccc' } } }
       }
     });
 
+    // Conexão com HiveMQ Cloud (Serverless)
     const clientID = "mqttjs_" + Math.random().toString(16).substr(2, 8);
-    const mqttClient = new Paho.MQTT.Client("broker.hivemq.com", 8884, clientID);
+
+    const mqttClient = new Paho.MQTT.Client(
+      "8b636f536c81441b8d1e3bb0ad8e95ff.s1.eu.hivemq.cloud",
+      8884,
+      "/mqtt",
+      clientID
+    );
 
     mqttClient.onConnectionLost = () => {
       mqttLog.textContent += "\n🔌 Conexão perdida.";
+      mqttLog.classList.add("status");
     };
 
     mqttClient.onMessageArrived = function (message) {
       const topico = message.destinationName;
       const valor = message.payloadString;
-      const linha = `[${topico}] ${valor}`;
-      mqttLog.textContent += "\n" + linha;
+      mqttLog.textContent += `\n[${topico}] ${valor}`;
 
-      const agora = new Date().toLocaleTimeString();
+      const hora = new Date().toLocaleTimeString();
 
       if (topico === "Gladimir/temp") {
         tempSpan.textContent = valor;
-        atualizarGrafico(chartTemp, agora, parseFloat(valor));
+        atualizarGrafico(chartTemp, hora, parseFloat(valor));
       } else if (topico === "Gladimir/umid") {
         umidSpan.textContent = valor;
-        atualizarGrafico(chartUmid, agora, parseFloat(valor));
+        atualizarGrafico(chartUmid, hora, parseFloat(valor));
       }
     };
 
     mqttClient.connect({
       useSSL: true,
+      userName: "gladimir",
+      password: "F3licidade",
       onSuccess: () => {
-        mqttLog.textContent = "Conectado ao HiveMQ via WSS\n";
+        mqttLog.textContent = "✅ Conectado ao HiveMQ Cloud via WSS";
+        mqttLog.classList.remove("status");
         mqttClient.subscribe("Gladimir/#");
       },
       onFailure: (err) => {
-        mqttLog.textContent = "Falha na conexão: " + err.errorMessage;
+        mqttLog.textContent = "❌ Falha: " + err.errorMessage;
+        mqttLog.classList.add("status");
       }
     });
 
@@ -172,7 +168,7 @@
       const msg = new Paho.MQTT.Message(mensagem);
       msg.destinationName = topico;
       mqttClient.send(msg);
-      mqttLog.textContent += `\n Enviado → [${topico}] ${mensagem}`;
+      mqttLog.textContent += `\n📤 Enviado: [${topico}] ${mensagem}`;
     }
 
     function atualizarGrafico(chart, label, valor) {
