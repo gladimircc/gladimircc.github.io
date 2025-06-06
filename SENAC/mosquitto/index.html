@@ -8,7 +8,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- ✅ Paho MQTT deve vir ANTES do uso -->
+  <!-- Paho MQTT deve vir ANTES do uso -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
 
   <style>
@@ -59,23 +59,23 @@
   </style>
 </head>
 <body>
-  <h1>🚀 Painel Gladimir – ESP32 + MQTT</h1>
+  <h1>Gladimir – ESP32 + MQTT</h1>
 
   <div class="mqtt-section">
     <h3>🔌 Conexão MQTT (HiveMQ)</h3>
     <pre id="mosquittoLog">Aguardando conexão...</pre>
 
     <div class="mqtt-buttons">
-      <button onclick="enviarComando('Gladimir/led', 'liga')">🔆 Ligar LED</button>
-      <button onclick="enviarComando('Gladimir/led', 'desliga')">🌑 Desligar LED</button>
+      <button onclick="enviarComando('Gladimir/led', 'liga')">Ligar Luz</button>
+      <button onclick="enviarComando('Gladimir/led', 'desliga')">Desligar Luz</button>
     </div>
 
     <div class="mqtt-values">
-      <p>🌡️ Temperatura: <span id="tempValue">--</span> °C</p>
-      <p>💧 Umidade: <span id="umidValue">--</span> %</p>
+      <p>Temperatura: <span id="tempValue">--</span> °C</p>
+      <p>Umidade: <span id="umidValue">--</span> %</p>
     </div>
 
-    <h3>📊 Gráficos</h3>
+    <h3>Gráficos</h3>
     <canvas id="chartTemp" height="150"></canvas>
     <canvas id="chartUmid" height="150"></canvas>
   </div>
