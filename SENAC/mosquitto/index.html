@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gladimir - Painel IoT</title>
+  <title>Gladimir - UniSENAC Pelotas IoT</title>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Paho MQTT (corrigido: versão estável que funciona com navegador) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  <script src="https://unpkg.com/paho-mqtt@1.1.0/paho-mqtt-min.js"></script>
 
   <style>
     :root {
@@ -33,11 +31,29 @@
       padding-top: 20px;
     }
 
+    .mqtt-buttons {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
     .mqtt-buttons button {
-      margin-right: 10px;
-      padding: 5px 10px;
-      font-size: 1em;
+      padding: 10px 20px;
+      font-size: 1.1em;
       cursor: pointer;
+    }
+
+    .lamp-indicator {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 3px solid limegreen;
+      background-color: black;
+    }
+
+    .lamp-on {
+      background-color: limegreen;
     }
 
     .mqtt-values {
@@ -68,19 +84,20 @@
 
   <div class="mqtt-section">
     <h3>Conexão MQTT (HiveMQ)</h3>
-    <pre id="mosquittoLog" class="status-yellow">🕒 Aguardando conexão...</pre>
+    <pre id="mosquittoLog" class="status-yellow">Aguardando conexão...</pre>
 
     <div class="mqtt-buttons">
       <button onclick="enviarComando('Gladimir/led', 'liga')">Ligar Luz</button>
+      <div id="lamp" class="lamp-indicator"></div>
       <button onclick="enviarComando('Gladimir/led', 'desliga')">Desligar Luz</button>
     </div>
 
     <div class="mqtt-values">
-      <p>🌡️ Temperatura: <span id="tempValue">--</span> °C</p>
-      <p>💧 Umidade: <span id="umidValue">--</span> %</p>
+      <p>Temperatura: <span id="tempValue">--</span> °C</p>
+      <p>Umidade: <span id="umidValue">--</span> %</p>
     </div>
 
-    <h3>📊 Gráficos</h3>
+    <h3>Gráficos</h3>
     <canvas id="chartTemp" height="150"></canvas>
     <canvas id="chartUmid" height="150"></canvas>
   </div>
@@ -89,8 +106,8 @@
     const mqttLog = document.getElementById("mosquittoLog");
     const tempSpan = document.getElementById("tempValue");
     const umidSpan = document.getElementById("umidValue");
+    const lamp = document.getElementById("lamp");
 
-    // Gráfico de temperatura
     const chartTemp = new Chart(document.getElementById("chartTemp").getContext("2d"), {
       type: "line",
       data: {
@@ -114,7 +131,6 @@
       }
     });
 
-    // Gráfico de umidade
     const chartUmid = new Chart(document.getElementById("chartUmid").getContext("2d"), {
       type: "line",
       data: {
@@ -138,7 +154,6 @@
       }
     });
 
-    // CLIENTE MQTT para HiveMQ Cloud PESSOAL
     const clientID = "mqttjs_" + Math.random().toString(16).substr(2, 8);
     const mqttClient = new Paho.MQTT.Client(
       "8b636f536c81441b8d1e3bb0ad8e95ff.s1.eu.hivemq.cloud",
@@ -147,14 +162,13 @@
     );
 
     mqttClient.onConnectionLost = () => {
-      mqttLog.innerHTML += "\n🔌 Conexão perdida.";
+      mqttLog.innerHTML = "🔌 Conexão perdida.";
+      mqttLog.classList.add("status-yellow");
     };
 
     mqttClient.onMessageArrived = function (message) {
       const topico = message.destinationName;
       const valor = message.payloadString;
-      mqttLog.innerHTML += `<br>📩 <b>${topico}</b>: ${valor}`;
-
       const agora = new Date().toLocaleTimeString();
 
       if (topico === "Gladimir/temp") {
@@ -163,6 +177,12 @@
       } else if (topico === "Gladimir/umid") {
         umidSpan.textContent = valor;
         atualizarGrafico(chartUmid, agora, parseFloat(valor));
+      } else if (topico === "Gladimir/led") {
+        if (valor === "liga") {
+          lamp.classList.add("lamp-on");
+        } else {
+          lamp.classList.remove("lamp-on");
+        }
       }
     };
 
@@ -172,11 +192,12 @@
       password: "F3licidade",
       onSuccess: () => {
         mqttLog.classList.remove("status-yellow");
-        mqttLog.innerHTML = "✅ <span style='color:lightgreen'>Conectado ao HiveMQ via WSS</span><br>";
+        mqttLog.innerHTML = "<span style='color:lightgreen'>Conectado ao HiveMQ via WSS</span>";
         mqttClient.subscribe("Gladimir/#");
       },
       onFailure: (err) => {
-        mqttLog.innerHTML = `<span style='color:red'>❌ Falha na conexão: ${err.errorMessage}</span>`;
+        mqttLog.innerHTML = `<span style='color:red'>Falha na conexão: ${err.errorMessage}</span>`;
+        mqttLog.classList.add("status-yellow");
       }
     });
 
@@ -184,7 +205,15 @@
       const msg = new Paho.MQTT.Message(mensagem);
       msg.destinationName = topico;
       mqttClient.send(msg);
-      mqttLog.innerHTML += `<br>🚀 Enviado → <b>${topico}</b>: ${mensagem}`;
+
+      // Círculo sem aguardar mensagem de retorno
+      if (topico === "Gladimir/led") {
+        if (mensagem === "liga") {
+          lamp.classList.add("lamp-on");
+        } else {
+          lamp.classList.remove("lamp-on");
+        }
+      }
     }
 
     function atualizarGrafico(chart, label, valor) {
