@@ -3,22 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prof. Gladimir Ceroni Catarino</title>
+  <title>Gladimir IoT Panel</title>
   <style>
     :root {
       --bg-color: #000;
       --text-color: #33ff33;
       --link-color: #3399ff;
       --dir-color: #ff66ff;
-      --logo-url: url('https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas2.jpg');
-    }
-
-    body.light {
-      --bg-color: #fff;
-      --text-color: #222;
-      --link-color: #0077cc;
-      --dir-color: #bb00bb;
-      --logo-url: url('https://gladimircc.github.io/identidade_visual/unisenac_campus_pelotas_cinza.jpg');
     }
 
     body {
@@ -26,70 +17,7 @@
       color: var(--text-color);
       font-family: monospace;
       font-size: 1.1em;
-      margin: 0;
       padding: 20px;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-img {
-      width: 160px;
-      height: 60px;
-      background-image: var(--logo-url);
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-
-    .breadcrumb {
-      margin: 10px 0;
-      font-size: 1.3em;
-    }
-
-    .breadcrumb a {
-      color: var(--link-color);
-    }
-
-    .entry {
-      margin: 5px 0;
-      font-size: 1.15em;
-    }
-
-    .folder {
-      color: var(--dir-color);
-    }
-
-    .file {
-      color: var(--link-color);
-    }
-
-    #themeToggle {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 5px 10px;
-      border: 1px solid var(--text-color);
-      background: transparent;
-      color: var(--text-color);
-      cursor: pointer;
-    }
-
-    .back-link {
-      display: inline-block;
-      margin-top: 10px;
     }
 
     .mqtt-section {
@@ -104,122 +32,159 @@
       font-size: 1em;
       cursor: pointer;
     }
+
+    .mqtt-values {
+      margin-top: 15px;
+      font-size: 1.2em;
+    }
+
+    .mqtt-values span {
+      font-weight: bold;
+      color: var(--dir-color);
+    }
+
+    canvas {
+      max-width: 100%;
+      background-color: #111;
+      border: 1px solid #444;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <button id="themeToggle">Alternar tema</button>
+  <h1>🚀 Painel Gladimir – ESP32 + MQTT</h1>
 
-  <div class="logo">
-    <div class="logo-img" aria-hidden="true"></div>
-    <h1>Prof. Gladimir Ceroni Catarino</h1>
-  </div>
-
-  <div id="breadcrumb" class="breadcrumb"></div>
-  <a id="backLink" class="back-link" href="#">↩️ Voltar</a>
-
-  <pre id="lista"></pre>
-  <p id="contador"></p>
-
-  <!-- ✅ Seção MQTT -->
   <div class="mqtt-section">
-    <h3>🔌 Mosquitto</h3>
-    <pre id="mosquittoLog">Aguardando conexão com o broker MQTT...</pre>
+    <h3>🔌 Conexão MQTT (HiveMQ)</h3>
+    <pre id="mosquittoLog">Aguardando conexão...</pre>
 
     <div class="mqtt-buttons">
-      <button onclick="enviarComando('Gladimir/led', 'liga')">Ligar LED</button>
-      <button onclick="enviarComando('Gladimir/led', 'desliga')">Desligar LED</button>
+      <button onclick="enviarComando('Gladimir/led', 'liga')">🔆 Ligar LED</button>
+      <button onclick="enviarComando('Gladimir/led', 'desliga')">🌑 Desligar LED</button>
     </div>
+
+    <div class="mqtt-values">
+      <p>🌡️ Temperatura: <span id="tempValue">--</span> °C</p>
+      <p>💧 Umidade: <span id="umidValue">--</span> %</p>
+    </div>
+
+    <h3>📊 Gráficos</h3>
+    <canvas id="chartTemp" height="150"></canvas>
+    <canvas id="chartUmid" height="150"></canvas>
   </div>
 
-  <!-- Script para alternar tema e carregar arquivos -->
-  <script>
-    const toggleBtn = document.getElementById("themeToggle");
-    const currentTheme = localStorage.getItem("theme") || "dark";
-    document.body.classList.toggle("light", currentTheme === "light");
-
-    toggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("light");
-      localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
-    });
-
-    const path = window.location.pathname.replace(/^\/|\/$/g, "");
-    const pastaAtual = path || "~";
-
-    const breadcrumb = document.getElementById("breadcrumb");
-    const partes = pastaAtual === "~" ? [] : pastaAtual.split("/");
-    if (partes.length === 0) {
-      breadcrumb.innerHTML = `📁 <a href="/">~</a>`;
-    } else {
-      let acumulador = "";
-      breadcrumb.innerHTML = `📁 <a href="/">~</a>`;
-      partes.forEach((parte, i) => {
-        acumulador += "/" + parte;
-        breadcrumb.innerHTML += ` / <a href="${acumulador}/">${parte}</a>`;
-      });
-    }
-
-    const backLink = document.getElementById("backLink");
-    const upDir = path.split("/").slice(0, -1).join("/");
-    backLink.href = "/" + upDir;
-    if (pastaAtual === "~") backLink.style.display = "none";
-
-    fetch("/files.json")
-      .then((r) => r.json())
-      .then((data) => {
-        const container = document.getElementById("lista");
-
-        const entries = data.filter((item) => {
-          if (pastaAtual === "~") return !item.path.includes("/");
-          return item.path.startsWith(pastaAtual + "/") && item.path.split("/").length === pastaAtual.split("/").length + 1;
-        });
-
-        const pastas = entries.filter(e => e.type === "folder").sort((a, b) => a.name.localeCompare(b.name));
-        const arquivos = entries.filter(e => e.type === "file").sort((a, b) => a.name.localeCompare(b.name));
-
-        pastas.forEach(e => {
-          container.innerHTML += `<div class="entry folder">📁 <a href="${e.name}/">${e.name}</a></div>`;
-        });
-
-        arquivos.forEach(e => {
-          container.innerHTML += `<div class="entry file">📄 <a href="/${e.path}">${e.name}</a></div>`;
-        });
-
-        document.getElementById("contador").textContent = `${pastas.length} pasta(s), ${arquivos.length} arquivo(s)`;
-      });
-  </script>
-
-  <!-- ✅ MQTT via WebSocket (Mosquitto) -->
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Paho MQTT -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js"></script>
+
   <script>
+    // Elementos
     const mqttLog = document.getElementById("mosquittoLog");
-    const mqttClientID = "mqttjs_" + Math.random().toString(16).substr(2, 8);
-    const mqttClient = new Paho.MQTT.Client("test.mosquitto.org", 8080, mqttClientID);
+    const tempSpan = document.getElementById("tempValue");
+    const umidSpan = document.getElementById("umidValue");
 
-    mqttClient.onConnectionLost = (responseObject) => {
-      mqttLog.textContent += "\n🔌 Conexão perdida.";
-    };
-
-    mqttClient.onMessageArrived = (message) => {
-      const linha = `[${message.destinationName}] ${message.payloadString}`;
-      mqttLog.textContent += "\n" + linha;
-    };
-
-    mqttClient.connect({
-      onSuccess: () => {
-        mqttLog.textContent = "✅ Conectado ao broker Mosquitto (test.mosquitto.org:8080)\nAguardando mensagens...\n";
-        mqttClient.subscribe("Gladimir/#");
+    // Gráfico de temperatura
+    const ctxTemp = document.getElementById("chartTemp").getContext("2d");
+    const chartTemp = new Chart(ctxTemp, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Temperatura (°C)",
+          data: [],
+          borderColor: "#ff6666",
+          backgroundColor: "rgba(255, 100, 100, 0.2)",
+          tension: 0.2
+        }]
       },
-      onFailure: (err) => {
-        mqttLog.textContent = "❌ Falha ao conectar: " + err.errorMessage;
+      options: {
+        scales: {
+          x: { ticks: { color: '#ccc' }, grid: { color: '#333' } },
+          y: { ticks: { color: '#ccc' }, grid: { color: '#333' } }
+        },
+        plugins: {
+          legend: { labels: { color: '#ccc' } }
+        }
       }
     });
 
-    // ✅ Função para publicar comandos via botão
+    // Gráfico de umidade
+    const ctxUmid = document.getElementById("chartUmid").getContext("2d");
+    const chartUmid = new Chart(ctxUmid, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Umidade (%)",
+          data: [],
+          borderColor: "#66ccff",
+          backgroundColor: "rgba(100, 200, 255, 0.2)",
+          tension: 0.2
+        }]
+      },
+      options: {
+        scales: {
+          x: { ticks: { color: '#ccc' }, grid: { color: '#333' } },
+          y: { ticks: { color: '#ccc' }, grid: { color: '#333' } }
+        },
+        plugins: {
+          legend: { labels: { color: '#ccc' } }
+        }
+      }
+    });
+
+    // MQTT
+    const clientID = "mqttjs_" + Math.random().toString(16).substr(2, 8);
+    const mqttClient = new Paho.MQTT.Client("broker.hivemq.com", 8884, clientID);
+
+    mqttClient.onConnectionLost = () => {
+      mqttLog.textContent += "\n🔌 Conexão perdida.";
+    };
+
+    mqttClient.onMessageArrived = function (message) {
+      const topico = message.destinationName;
+      const valor = message.payloadString;
+      const linha = `[${topico}] ${valor}`;
+      mqttLog.textContent += "\n" + linha;
+
+      const agora = new Date().toLocaleTimeString();
+
+      if (topico === "Gladimir/temp") {
+        tempSpan.textContent = valor;
+        atualizarGrafico(chartTemp, agora, parseFloat(valor));
+      } else if (topico === "Gladimir/umid") {
+        umidSpan.textContent = valor;
+        atualizarGrafico(chartUmid, agora, parseFloat(valor));
+      }
+    };
+
+    mqttClient.connect({
+      useSSL: true,
+      onSuccess: () => {
+        mqttLog.textContent = "✅ Conectado ao HiveMQ via WSS\n";
+        mqttClient.subscribe("Gladimir/#");
+      },
+      onFailure: (err) => {
+        mqttLog.textContent = "❌ Falha na conexão: " + err.errorMessage;
+      }
+    });
+
     function enviarComando(topico, mensagem) {
       const msg = new Paho.MQTT.Message(mensagem);
       msg.destinationName = topico;
       mqttClient.send(msg);
       mqttLog.textContent += `\n🔼 Enviado → [${topico}] ${mensagem}`;
+    }
+
+    function atualizarGrafico(chart, label, valor) {
+      if (chart.data.labels.length > 30) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(valor);
+      chart.update();
     }
   </script>
 </body>
