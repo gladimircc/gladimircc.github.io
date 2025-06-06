@@ -83,7 +83,7 @@
   </style>
 </head>
 <body>
-  <h1>Gladimir – ESP32 + MQTT</h1>
+  <h1>UniSENAC Pelotas - IoT - Gladimir</h1>
 
   <div class="mqtt-section">
     <h3>Conexão MQTT (HiveMQ)</h3>
@@ -204,20 +204,25 @@
       }
     });
 
-    function enviarComando(topico, mensagem) {
-      const msg = new Paho.MQTT.Message(mensagem);
-      msg.destinationName = topico;
-      mqttClient.send(msg);
+function enviarComando(topico, mensagem) {
+  if (mqttClient.isConnected()) {
+    const msg = new Paho.MQTT.Message(mensagem);
+    msg.destinationName = topico;
+    mqttClient.send(msg);
 
-      // Círculo sem aguardar mensagem de retorno
-      if (topico === "Gladimir/led") {
-        if (mensagem === "liga") {
-          lamp.classList.add("lamp-on");
-        } else {
-          lamp.classList.remove("lamp-on");
-        }
+    if (topico === "Gladimir/led") {
+      if (mensagem === "liga") {
+        lamp.classList.add("lamp-on");
+      } else {
+        lamp.classList.remove("lamp-on");
       }
     }
+  } else {
+    mqttLog.innerHTML = `<span style="color:yellow">⚠️ MQTT ainda não conectado!</span>`;
+    mqttLog.classList.add("status-yellow");
+  }
+}
+
 
     function atualizarGrafico(chart, label, valor) {
       if (chart.data.labels.length > 30) {
