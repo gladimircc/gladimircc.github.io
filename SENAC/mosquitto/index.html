@@ -160,11 +160,11 @@
     mqttClient.connect({
       useSSL: true,
       onSuccess: () => {
-        mqttLog.textContent = "✅ Conectado ao HiveMQ via WSS\n";
+        mqttLog.textContent = "Conectado ao HiveMQ via WSS\n";
         mqttClient.subscribe("Gladimir/#");
       },
       onFailure: (err) => {
-        mqttLog.textContent = "❌ Falha na conexão: " + err.errorMessage;
+        mqttLog.textContent = "Falha na conexão: " + err.errorMessage;
       }
     });
 
@@ -172,7 +172,7 @@
       const msg = new Paho.MQTT.Message(mensagem);
       msg.destinationName = topico;
       mqttClient.send(msg);
-      mqttLog.textContent += `\n🔼 Enviado → [${topico}] ${mensagem}`;
+      mqttLog.textContent += `\n Enviado → [${topico}] ${mensagem}`;
     }
 
     function atualizarGrafico(chart, label, valor) {
