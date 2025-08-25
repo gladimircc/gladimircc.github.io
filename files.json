@@ -15,6 +15,11 @@
     "type": "file"
   },
   {
+    "name": "futebol",
+    "path": "futebol",
+    "type": "folder"
+  },
+  {
     "name": "identidade_visual",
     "path": "identidade_visual",
     "type": "folder"
@@ -48,6 +53,11 @@
     "name": "tec",
     "path": "SENAC/tec",
     "type": "folder"
+  },
+  {
+    "name": "brasileiro.html",
+    "path": "futebol/brasileiro.html",
+    "type": "file"
   },
   {
     "name": "unisenac_campus_pelotas2.jpg",
