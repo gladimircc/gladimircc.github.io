@@ -63,15 +63,15 @@
                 <tr>
                     <th>Posição</th>
                     <th>Time</th>
-                    <th>P</th>
-                    <th>J</th>
-                    <th>V</th>
-                    <th>E</th>
-                    <th>D</th>
-                    <th>GP</th>
-                    <th>GC</th>
-                    <th>SG</th>
-                    <th>%</th>
+                    <th>Pontos</th>
+                    <th>Jogos</th>
+                    <th>Vitórias</th>
+                    <th>Empates</th>
+                    <th>Derrotas</th>
+                    <th>Gols Pro</th>
+                    <th>Gols Contra</th>
+                    <th>Saldo de Gols</th>
+                    <th>Aproveitamento (%)</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,11 +81,11 @@
     </div>
 
     <script>
-        const API_KEY = '870a9e147b0e4fedb12fa63bb4cc028c'; // API KEY
-
+        const API_KEY = '870a9e147b0e4fedb12fa63bb4cc028c';
+        
         async function fetchStandings() {
-            const leagueId = 71; // ID do Brasileirão Série A
-            const season = 2025; // Temporada 2025
+            const leagueId = 71;
+            const season = 2025;
 
             const url = `https://v3.football.api-sports.io/standings?league=${leagueId}&season=${season}`;
             
@@ -93,7 +93,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'x-apisports-key': API_KEY,
+                        'x-apisports-key': API_KEY, // <-- Linha corrigida
                     },
                 });
 
@@ -119,7 +119,7 @@
 
         function populateTable(standings) {
             const tbody = document.querySelector('#tabela-brasileirao tbody');
-            tbody.innerHTML = ''; // Limpa a mensagem de carregamento
+            tbody.innerHTML = '';
 
             standings.forEach(team => {
                 const row = document.createElement('tr');
