@@ -63,15 +63,15 @@
                 <tr>
                     <th>Posição</th>
                     <th>Time</th>
-                    <th>Pontos</th>
-                    <th>Jogos</th>
-                    <th>Vitórias</th>
-                    <th>Empates</th>
-                    <th>Derrotas</th>
-                    <th>Gols Pro</th>
-                    <th>Gols Contra</th>
-                    <th>Saldo de Gols</th>
-                    <th>Aproveitamento (%)</th>
+                    <th>P</th>
+                    <th>J</th>
+                    <th>V</th>
+                    <th>E</th>
+                    <th>D</th>
+                    <th>GP</th>
+                    <th>GC</th>
+                    <th>SG</th>
+                    <th>%</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,7 +82,7 @@
 
     <script>
         const API_KEY = '870a9e147b0e4fedb12fa63bb4cc028c';
-        
+
         async function fetchStandings() {
             const leagueId = 71;
             const season = 2025;
@@ -93,7 +93,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'x-apisports-key': API_KEY, // <-- Linha corrigida
+                        'x-apisports-key': API_KEY,
                     },
                 });
 
