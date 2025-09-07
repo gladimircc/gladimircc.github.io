@@ -70,6 +70,26 @@
     "type": "file"
   },
   {
+    "name": "Diagrama.png",
+    "path": "pesquisa/Diagrama.png",
+    "type": "file"
+  },
+  {
+    "name": "circuito.png",
+    "path": "pesquisa/circuito.png",
+    "type": "file"
+  },
+  {
+    "name": "contador.txt",
+    "path": "pesquisa/contador.txt",
+    "type": "file"
+  },
+  {
+    "name": "server.js",
+    "path": "pesquisa/server.js",
+    "type": "file"
+  },
+  {
     "name": "exemplo.txt",
     "path": "teste/exemplo.txt",
     "type": "file"
