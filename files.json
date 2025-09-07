@@ -25,6 +25,11 @@
     "type": "folder"
   },
   {
+    "name": "pesquisa",
+    "path": "pesquisa",
+    "type": "folder"
+  },
+  {
     "name": "teste",
     "path": "teste",
     "type": "folder"
