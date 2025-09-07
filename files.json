@@ -75,6 +75,11 @@
     "type": "file"
   },
   {
+    "name": "MonitorDeEventos_WiFi.ino",
+    "path": "pesquisa/MonitorDeEventos_WiFi.ino",
+    "type": "file"
+  },
+  {
     "name": "circuito.png",
     "path": "pesquisa/circuito.png",
     "type": "file"
